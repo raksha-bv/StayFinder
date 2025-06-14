@@ -148,8 +148,8 @@ const FeaturedStays = () => {
   ];
 
   return (
-    <div className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
-      <div className="scrolling-container mb-6 sm:mb-8">
+    <div className="py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
+      <div className="scrolling-container mb-4 sm:mb-6 md:mb-8">
         <div className="horizontal-scrolling-items">
           <div className="horizontal-scrolling-items__item">
             FEATURED STAYS • FEATURED STAYS • FEATURED STAYS • FEATURED STAYS •
@@ -165,9 +165,12 @@ const FeaturedStays = () => {
       </div>
 
       <div className="overflow-x-auto scrollbar-hide">
-        <div className="flex space-x-3 sm:space-x-4 lg:space-x-6 pb-4">
+        <div className="flex space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 pb-4">
           {stays.map((stay, index) => (
-            <div key={index} className="flex-shrink-0 w-56 xs:w-60 sm:w-64 md:w-72 lg:w-80">
+            <div
+              key={index}
+              className="flex-shrink-0 w-40 xs:w-44 sm:w-52 md:w-60 lg:w-72 xl:w-80"
+            >
               <StayCard {...stay} />
             </div>
           ))}
@@ -191,9 +194,9 @@ const FeaturedStays = () => {
 
         .horizontal-scrolling-items {
           display: flex;
-          font-size: 1.5rem;
+          font-size: 1.25rem;
           animation-name: infiniteScroll;
-          animation-duration: 25s;
+          animation-duration: 30s;
           animation-iteration-count: infinite;
           animation-timing-function: linear;
         }
@@ -204,28 +207,42 @@ const FeaturedStays = () => {
           color: #111827;
         }
 
+        @media (min-width: 375px) {
+          .horizontal-scrolling-items {
+            font-size: 1.4rem;
+            animation-duration: 28s;
+          }
+        }
+
         @media (min-width: 480px) {
           .horizontal-scrolling-items {
-            font-size: 1.75rem;
-            animation-duration: 22s;
+            font-size: 1.6rem;
+            animation-duration: 25s;
           }
         }
 
         @media (min-width: 640px) {
           .horizontal-scrolling-items {
-            font-size: 2rem;
-            animation-duration: 20s;
+            font-size: 1.8rem;
+            animation-duration: 22s;
           }
         }
 
         @media (min-width: 768px) {
           .horizontal-scrolling-items {
-            font-size: 2.5rem;
-            animation-duration: 18s;
+            font-size: 2.2rem;
+            animation-duration: 20s;
           }
         }
 
         @media (min-width: 1024px) {
+          .horizontal-scrolling-items {
+            font-size: 2.8rem;
+            animation-duration: 18s;
+          }
+        }
+
+        @media (min-width: 1280px) {
           .horizontal-scrolling-items {
             font-size: 3rem;
             animation-duration: 20s;
@@ -243,8 +260,8 @@ const FeaturedStays = () => {
 
         /* Custom breakpoint for extra small screens */
         @media (min-width: 475px) {
-          .xs\:w-60 {
-            width: 15rem;
+          .xs\:w-44 {
+            width: 11rem;
           }
         }
       `}</style>
