@@ -149,11 +149,21 @@ const FeaturedStays = () => {
 
   return (
     <div className="py-16 px-6 sm:px-8 lg:px-12 xl:px-16">
-      <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-8 text-left">
-        Featured Stays
-      </h2>
-      <div className="overflow-x-auto scrollbar-hide no-scrollbar">
-        <div className="flex space-x-4 md:space-x-6 pb-4" style={{ width: 'fit-content' }}>
+      <div className="scrolling-container mb-8">
+        <div className="horizontal-scrolling-items">
+          <div className="horizontal-scrolling-items__item">
+            Featured Stays • Featured Stays • Featured Stays • Featured Stays •
+            Featured Stays • Featured Stays • Featured Stays • Featured Stays •&nbsp;
+          </div>
+          <div className="horizontal-scrolling-items__item">
+            Featured Stays • Featured Stays • Featured Stays • Featured Stays •
+            Featured Stays • Featured Stays • Featured Stays • Featured Stays •&nbsp;
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto scrollbar-hide">
+        <div className="flex space-x-4 md:space-x-6 pb-4">
           {stays.map((stay, index) => (
             <div key={index} className="flex-shrink-0 w-64 sm:w-72">
               <StayCard {...stay} />
@@ -161,6 +171,52 @@ const FeaturedStays = () => {
           ))}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes infiniteScroll {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-50%);
+          }
+        }
+
+        .scrolling-container {
+          width: 100%;
+          overflow-x: hidden;
+        }
+
+        .horizontal-scrolling-items {
+          display: flex;
+          font-size: 2rem;
+          animation-name: infiniteScroll;
+          animation-duration: 20s;
+          animation-iteration-count: infinite;
+          animation-timing-function: linear;
+        }
+
+        .horizontal-scrolling-items__item {
+          white-space: nowrap;
+          font-weight: 600;
+          color: #111827;
+        }
+
+        @media (min-width: 768px) {
+          .horizontal-scrolling-items {
+            font-size: 3rem;
+          }
+        }
+
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };
