@@ -54,49 +54,49 @@ const WhyChooseUs = () => {
   ];
 
   return (
-    <section className="h-screen w-full py-8 px-8 bg-gradient-to-br from-gray-50 to-white flex flex-col justify-center">
-      <div className="w-full max-w-7xl mx-auto h-full flex flex-col justify-center">
+    <section className="w-full py-12 sm:py-16 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-gradient-to-br from-gray-50 to-white">
+      <div className="w-full max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-3 sm:mb-4 lg:mb-6 leading-tight">
             Why Choose{" "}
             <span className="bg-gradient-to-r from-rose-500 to-rose-600 bg-clip-text text-transparent">
               StayFinder
             </span>
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-2xl sm:max-w-3xl lg:max-w-4xl mx-auto leading-relaxed px-4 sm:px-0">
             We're not just another booking platform. We're your trusted partner
             in discovering extraordinary travel experiences.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 flex-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 lg:mb-16">
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
             return (
               <div
                 key={index}
-                className="group relative bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
+                className="group relative bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 sm:hover:-translate-y-2 border border-gray-100"
               >
                 {/* Content */}
                 <div className="relative z-10">
                   {/* Icon */}
                   <div
-                    className={`w-12 h-12 bg-gradient-to-br ${feature.bgGradient} rounded-2xl flex items-center justify-center mb-4`}
+                    className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br ${feature.bgGradient} rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 lg:mb-6`}
                   >
                     <IconComponent
-                      className={`w-6 h-6 bg-gradient-to-br ${feature.gradient} bg-clip-text text-transparent`}
+                      className={`w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 bg-gradient-to-br ${feature.gradient} bg-clip-text text-transparent`}
                     />
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-2 sm:mb-3 leading-tight">
                     {feature.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-xs sm:text-sm lg:text-base text-gray-600 leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -106,30 +106,38 @@ const WhyChooseUs = () => {
         </div>
 
         {/* Bottom Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 text-center max-w-xs sm:max-w-2xl lg:max-w-4xl mx-auto">
           <div className="group">
-            <div className="text-2xl md:text-3xl font-black text-gray-900 mb-1">
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 mb-1 sm:mb-2">
               300+
             </div>
-            <div className="text-sm text-gray-600">Unique Stays</div>
+            <div className="text-xs sm:text-sm lg:text-base text-gray-600">
+              Unique Stays
+            </div>
           </div>
           <div className="group">
-            <div className="text-2xl md:text-3xl font-black text-gray-900 mb-1">
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 mb-1 sm:mb-2">
               50K+
             </div>
-            <div className="text-sm text-gray-600">Happy Guests</div>
+            <div className="text-xs sm:text-sm lg:text-base text-gray-600">
+              Happy Guests
+            </div>
           </div>
           <div className="group">
-            <div className="text-2xl md:text-3xl font-black text-gray-900 mb-1">
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 mb-1 sm:mb-2">
               4.9★
             </div>
-            <div className="text-sm text-gray-600">Average Rating</div>
+            <div className="text-xs sm:text-sm lg:text-base text-gray-600">
+              Average Rating
+            </div>
           </div>
           <div className="group">
-            <div className="text-2xl md:text-3xl font-black text-gray-900 mb-1">
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 mb-1 sm:mb-2">
               24/7
             </div>
-            <div className="text-sm text-gray-600">Support</div>
+            <div className="text-xs sm:text-sm lg:text-base text-gray-600">
+              Support
+            </div>
           </div>
         </div>
       </div>
