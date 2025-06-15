@@ -54,8 +54,14 @@ const WhyChooseUs = () => {
   ];
 
   return (
-    <section className="min-h-screen w-full py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white flex flex-col justify-center">
-      <div className="w-full max-w-7xl mx-auto h-full flex flex-col justify-center">
+    <section className="min-h-screen w-full py-12 lg:py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gray-50 flex flex-col justify-center">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Grid pattern background */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:20px_20px] opacity-50"></div>
+      </div>
+
+      <div className="w-full max-w-7xl mx-auto h-full flex flex-col justify-center relative z-10">
         {/* Section Header */}
         <div className="text-center mb-8 lg:mb-12">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">

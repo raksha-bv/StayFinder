@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import { MapPin, Menu, X } from "lucide-react";
 
-const Navbar = () => {
+const Navbar = ({ onAuthClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleAuthClick = (authType) => {
+    setIsMenuOpen(false);
+    if (onAuthClick) {
+      onAuthClick(authType);
+    }
+  };
 
   return (
     <div className="absolute top-0 left-0 w-full p-4 sm:p-6 z-50">
@@ -38,18 +45,18 @@ const Navbar = () => {
             Help
           </a>
           <div className="flex items-center space-x-4 ml-6">
-            <a
-              href="#"
+            <button
+              onClick={() => handleAuthClick("signup")}
               className="hover:text-white transition-all duration-300"
             >
               Sign up
-            </a>
-            <a
-              href="#"
+            </button>
+            <button
+              onClick={() => handleAuthClick("login")}
               className="bg-white/10 backdrop-blur-sm hover:bg-white/20 px-4 py-2 rounded-full transition-all duration-300"
             >
               Log in
-            </a>
+            </button>
           </div>
         </div>
 
@@ -92,20 +99,18 @@ const Navbar = () => {
                 Help
               </a>
               <div className="border-t border-gray-200 pt-4 mt-4">
-                <a
-                  href="#"
-                  className="block hover:text-gray-600 transition-all duration-300 py-3 text-lg font-medium"
-                  onClick={() => setIsMenuOpen(false)}
+                <button
+                  onClick={() => handleAuthClick("signup")}
+                  className="block w-full hover:text-gray-600 transition-all duration-300 py-3 text-lg font-medium"
                 >
                   Sign up
-                </a>
-                <a
-                  href="#"
-                  className="block bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white px-6 py-3 rounded-full transition-all duration-300 mt-3 font-medium"
-                  onClick={() => setIsMenuOpen(false)}
+                </button>
+                <button
+                  onClick={() => handleAuthClick("login")}
+                  className="block w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white px-6 py-3 rounded-full transition-all duration-300 mt-3 font-medium"
                 >
                   Log in
-                </a>
+                </button>
               </div>
             </div>
           </div>
