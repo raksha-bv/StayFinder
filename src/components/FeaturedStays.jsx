@@ -150,7 +150,7 @@ const FeaturedStays = () => {
   return (
     <div className="py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
       <div className="scrolling-container mb-4 sm:mb-6 md:mb-8">
-        <div className="horizontal-scrolling-items">
+        <div className="horizontal-scrolling-items bebas-neue-regular">
           <div className="horizontal-scrolling-items__item">
             FEATURED STAYS • FEATURED STAYS • FEATURED STAYS • FEATURED STAYS •
             FEATURED STAYS • FEATURED STAYS • FEATURED STAYS • FEATURED STAYS
@@ -203,8 +203,9 @@ const FeaturedStays = () => {
 
         .horizontal-scrolling-items__item {
           white-space: nowrap;
-          font-weight: 600;
+          font-weight: 400;
           color: #111827;
+          font-family: "Bebas Neue", sans-serif;
         }
 
         @media (min-width: 375px) {
