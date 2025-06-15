@@ -88,7 +88,7 @@ const AuthPage = ({ isOpen, onClose, initialMode = 'login' }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={handleBackdropClick}
       onWheel={preventScroll}
       onTouchMove={preventScroll}
@@ -98,193 +98,192 @@ const AuthPage = ({ isOpen, onClose, initialMode = 'login' }) => {
         overscrollBehavior: 'none'
       }}
     >
-      {/* Mobile Layout */}
-      <div className="lg:hidden w-full h-full bg-gradient-to-br from-gray-50 to-white flex flex-col relative overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-rose-200/20 to-pink-200/20 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-blue-200/20 to-purple-200/20 rounded-full blur-3xl"></div>
-        </div>
+      {/* Mobile Layout - Redesigned */}
+      <div className="lg:hidden w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[95vh] flex flex-col">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-10 w-8 h-8 bg-black/10 hover:bg-black/20 rounded-full flex items-center justify-center text-gray-600 transition-colors duration-300"
+        >
+          <X className="w-4 h-4" />
+        </button>
 
-        {/* Compact Header */}
-        <div className="relative z-10 pt-8 pb-4 px-6">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            <X className="w-5 h-5 text-gray-600" />
-          </button>
-          
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-rose-500 to-rose-600 rounded-xl mb-3 shadow-lg">
-              <span className="text-white font-bold text-lg">S</span>
-            </div>
-            <h1 className="text-xl font-bold text-gray-900 mb-1">StayFinder</h1>
-            <p className="text-gray-600 text-xs">
+        {/* Mobile Header with Branding */}
+        <div className="bg-gradient-to-br from-rose-500 to-rose-600 px-6 py-8 text-white text-center relative overflow-hidden">
+          {/* Background Pattern - Simplified for mobile */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-2 right-4 w-12 h-12 border border-white rounded-full"></div>
+            <div className="absolute bottom-2 left-4 w-8 h-8 border border-white rounded-full"></div>
+            <div className="absolute top-1/2 left-1/4 w-4 h-4 bg-white rounded-full"></div>
+          </div>
+
+          <div className="relative z-10">
+            <h1 className="text-2xl font-bold mb-2">StayFinder</h1>
+            <p className="text-sm opacity-90">
               {isLogin ? 'Welcome back!' : 'Join our community'}
             </p>
+            
+            {/* Compact Features */}
+            <div className="flex justify-center space-x-6 mt-4">
+              <div className="flex items-center space-x-1">
+                <MapPin className="w-3 h-3" />
+                <span className="text-xs">Prime Locations</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Star className="w-3 h-3" />
+                <span className="text-xs">Top Rated</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Form Container - Now takes more space */}
-        <div className="flex-1 px-4 pb-4 relative z-10">
-          <div className="bg-white rounded-3xl shadow-xl p-5 h-full overflow-y-auto">
-            <div className="max-w-sm mx-auto">
-              <div className="text-center mb-5">
-                <h2 className="text-xl font-bold text-gray-900 mb-1">
-                  {isLogin ? 'Sign In' : 'Create Account'}
-                </h2>
-                <p className="text-gray-600 text-sm">
-                  {isLogin 
-                    ? 'Access your bookings and preferences' 
-                    : 'Start your journey with amazing stays'
-                  }
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {!isLogin && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="First name"
-                        value={formData.firstName}
-                        onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        className="w-full px-4 py-3.5 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-rose-500 focus:bg-white outline-none transition-all duration-200 text-sm placeholder-gray-500"
-                        required
-                      />
-                    </div>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Last name"
-                        value={formData.lastName}
-                        onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        className="w-full px-4 py-3.5 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-rose-500 focus:bg-white outline-none transition-all duration-200 text-sm placeholder-gray-500"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                  </div>
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-rose-500 focus:bg-white outline-none transition-all duration-200 text-sm placeholder-gray-500"
-                    required
-                  />
-                </div>
-
-                {!isLogin && (
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                    </div>
-                    <input
-                      type="tel"
-                      placeholder="Phone number"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-rose-500 focus:bg-white outline-none transition-all duration-200 text-sm placeholder-gray-500"
-                      required
-                    />
-                  </div>
-                )}
-
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                    <Lock className="w-4 h-4 text-gray-400" />
-                  </div>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-rose-500 focus:bg-white outline-none transition-all duration-200 text-sm placeholder-gray-500"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-
-                {!isLogin && (
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                      <Lock className="w-4 h-4 text-gray-400" />
-                    </div>
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm password"
-                      value={formData.confirmPassword}
-                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-rose-500 focus:bg-white outline-none transition-all duration-200 text-sm placeholder-gray-500"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between pt-2">
-                  <label className="flex items-center space-x-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.rememberMe}
-                      onChange={(e) => handleInputChange('rememberMe', e.target.checked)}
-                      className="w-4 h-4 text-rose-600 bg-gray-100 border-gray-300 rounded-md focus:ring-rose-500 focus:ring-2"
-                    />
-                    <span className="text-gray-700 text-sm">
-                      {isLogin ? 'Remember me' : 'I agree to Terms'}
-                    </span>
-                  </label>
-                  {isLogin && (
-                    <button type="button" className="text-rose-600 hover:text-rose-700 text-sm font-medium">
-                      Forgot?
-                    </button>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white py-4 rounded-xl font-semibold text-sm flex items-center justify-center space-x-2 hover:from-rose-600 hover:to-rose-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl mt-6"
-                >
-                  <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-
-                <div className="text-center pt-3">
-                  <p className="text-gray-600 text-sm">
-                    {isLogin ? "Don't have an account?" : "Already have an account?"}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={toggleAuthMode}
-                    className="text-rose-600 hover:text-rose-700 font-semibold text-sm mt-1 inline-flex items-center space-x-1"
-                  >
-                    <span>{isLogin ? 'Create one now' : 'Sign in instead'}</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              </form>
-            </div>
+        {/* Form Section */}
+        <div className="flex-1 p-6 flex flex-col justify-center">
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-1">
+              {isLogin ? 'Sign In' : 'Create Account'}
+            </h2>
+            <p className="text-gray-600 text-sm">
+              {isLogin 
+                ? 'Access your bookings and preferences' 
+                : 'Start your journey with amazing stays'
+              }
+            </p>
           </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {!isLogin && (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="First name"
+                    value={formData.firstName}
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-colors text-sm"
+                    required
+                  />
+                </div>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Last name"
+                    value={formData.lastName}
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-colors text-sm"
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="email"
+                placeholder="Email address"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-colors text-sm"
+                required
+              />
+            </div>
+
+            {!isLogin && (
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="tel"
+                  placeholder="Phone number"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-colors text-sm"
+                  required
+                />
+              </div>
+            )}
+
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+                className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-colors text-sm"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+
+            {!isLogin && (
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                  className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-colors text-sm"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between text-sm pt-1">
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.rememberMe}
+                  onChange={(e) => handleInputChange('rememberMe', e.target.checked)}
+                  className="w-4 h-4 text-rose-600 bg-gray-100 border-gray-300 rounded focus:ring-rose-500"
+                />
+                <span className="text-gray-700 text-xs">
+                  {isLogin ? 'Remember me' : 'I agree to Terms'}
+                </span>
+              </label>
+              {isLogin && (
+                <button type="button" className="text-rose-600 hover:text-rose-700 text-xs font-medium">
+                  Forgot?
+                </button>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white py-3 rounded-lg font-semibold text-sm hover:from-rose-600 hover:to-rose-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg mt-4"
+            >
+              {isLogin ? 'Sign In' : 'Create Account'}
+            </button>
+
+            <div className="text-center pt-3">
+              <p className="text-gray-600 text-xs">
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+              </p>
+              <button
+                type="button"
+                onClick={toggleAuthMode}
+                className="text-rose-600 hover:text-rose-700 font-semibold text-sm mt-1"
+              >
+                {isLogin ? 'Create one now' : 'Sign in instead'}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 

@@ -22,16 +22,25 @@
   display: none; /* Safari and Chrome */
 }
 
-/* Apply to body and html */
-body,
+/* Updated: Apply smooth scrolling and fix scroll issues */
 html {
+  scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
-  overflow-x: hidden;
 }
 
-body::-webkit-scrollbar,
 html::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  overflow-x: hidden; /* Only hide horizontal overflow */
+  /* Remove overflow-y hidden to allow vertical scrolling */
+}
+
+body::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
 

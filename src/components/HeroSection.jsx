@@ -60,6 +60,34 @@ const HeroSection = () => {
     };
   }, [showGuestDropdown]);
 
+  // Updated scroll function with better error handling and fallback
+  const scrollToFeaturedStays = () => {
+    const featuredStaysElement = document.getElementById('featured-stays');
+    if (featuredStaysElement) {
+      // Try modern scrollIntoView first
+      try {
+        featuredStaysElement.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        });
+      } catch (error) {
+        // Fallback for browsers that don't support smooth scroll
+        const elementPosition = featuredStaysElement.offsetTop;
+        window.scrollTo({
+          top: elementPosition,
+          behavior: 'smooth'
+        });
+      }
+    } else {
+      // Fallback: scroll down by viewport height if element not found
+      window.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <section className="relative min-h-screen w-full overflow-hidden flex flex-col items-center justify-center">
       {/* Background with enhanced gradient overlay */}
@@ -136,7 +164,9 @@ const HeroSection = () => {
                   ? "bg-white/20 scale-105 shadow-2xl"
                   : ""
               }`}
-              onClick={() => document.getElementById('checkin-desktop').showPicker()}
+              onClick={() =>
+                document.getElementById("checkin-desktop").showPicker()
+              }
             >
               <input
                 id="checkin-desktop"
@@ -167,7 +197,9 @@ const HeroSection = () => {
                   ? "bg-white/20 scale-105 shadow-2xl"
                   : ""
               }`}
-              onClick={() => document.getElementById('checkout-desktop').showPicker()}
+              onClick={() =>
+                document.getElementById("checkout-desktop").showPicker()
+              }
             >
               <input
                 id="checkout-desktop"
@@ -321,7 +353,7 @@ const HeroSection = () => {
               <div
                 className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-full p-3 sm:p-4 transition-all duration-300 hover:bg-white/15 h-20 sm:h-24 cursor-pointer relative"
                 onClick={() => {
-                  const input = document.getElementById('checkin-mobile');
+                  const input = document.getElementById("checkin-mobile");
                   input.focus();
                   input.showPicker();
                 }}
@@ -332,7 +364,12 @@ const HeroSection = () => {
                   value={filters.checkIn}
                   onChange={(e) => handleInputChange("checkIn", e.target.value)}
                   className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                  style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                  }}
                 />
                 <div className="flex flex-col items-center justify-center text-center h-full pointer-events-none">
                   <div className="p-1.5 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full mb-2">
@@ -350,7 +387,7 @@ const HeroSection = () => {
               <div
                 className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-full p-3 sm:p-4 transition-all duration-300 hover:bg-white/15 h-20 sm:h-24 cursor-pointer relative"
                 onClick={() => {
-                  const input = document.getElementById('checkout-mobile');
+                  const input = document.getElementById("checkout-mobile");
                   input.focus();
                   input.showPicker();
                 }}
@@ -359,9 +396,16 @@ const HeroSection = () => {
                   id="checkout-mobile"
                   type="date"
                   value={filters.checkOut}
-                  onChange={(e) => handleInputChange("checkOut", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("checkOut", e.target.value)
+                  }
                   className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                  style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                  }}
                 />
                 <div className="flex flex-col items-center justify-center text-center h-full pointer-events-none">
                   <div className="p-1.5 bg-gradient-to-br from-purple-400/20 to-purple-600/20 rounded-full mb-2">
@@ -431,9 +475,12 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Modern scroll indicator */}
+      {/* Modern scroll indicator - Updated with click handler */}
       <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-all duration-300 hover:scale-110">
+        <div 
+          className="w-10 h-10 sm:w-14 sm:h-14 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-all duration-300 hover:scale-110"
+          onClick={scrollToFeaturedStays}
+        >
           <ChevronDown className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
         </div>
       </div>
