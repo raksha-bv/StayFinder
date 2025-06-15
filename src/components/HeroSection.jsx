@@ -89,7 +89,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden flex flex-col items-center justify-center">
+    <section className="relative h-screen w-full overflow-hidden flex flex-col items-center justify-center">
       {/* Background with enhanced gradient overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -103,11 +103,11 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/20 to-black/50" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-      {/* Hero content */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        {/* Ultra-modern hero title */}
-        <div className="mb-8 sm:mb-12 lg:mb-16">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black mb-4 sm:mb-6 leading-[0.9] tracking-tight">
+      {/* Hero content - Adjusted spacing for mobile */}
+      <div className="relative z-10 flex flex-col items-center justify-center text-center text-white px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pt-16 sm:pt-20 pb-16 sm:pb-20">
+        {/* Ultra-modern hero title - Reduced margins on mobile */}
+        <div className="mb-6 sm:mb-12 lg:mb-16">
+          <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black mb-3 sm:mb-6 leading-[0.9] tracking-tight">
             Book unique accommodation
             <br />
             and{" "}
@@ -115,14 +115,14 @@ const HeroSection = () => {
               experiences
             </span>
           </h1>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 font-light max-w-xl sm:max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xs sm:text-base md:text-lg lg:text-xl text-white/80 font-light max-w-xl sm:max-w-2xl mx-auto leading-relaxed">
             Discover extraordinary places to stay and unique experiences around
             the world
           </p>
         </div>
 
         {/* Ultra-sleek search interface */}
-        <div className="w-full max-w-6xl">
+        <div className="w-full max-w-6xl flex-1 flex flex-col justify-center">
           {/* Desktop - Individual capsules with glass morphism */}
           <div className="hidden lg:flex items-center justify-center space-x-4 mb-8">
             {/* Where capsule */}
@@ -312,46 +312,36 @@ const HeroSection = () => {
             </button>
           </div>
 
-          {/* Mobile & Tablet - Compact capsules with full rounded corners */}
-          <div className="lg:hidden space-y-3 sm:space-y-4 max-w-lg mx-auto">
-            {/* Where capsule - Mobile with centered content */}
-            <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-full p-4 sm:p-5 transition-all duration-300 hover:bg-white/15 h-16 sm:h-20">
+          {/* Mobile & Tablet - Compact capsules with reduced spacing */}
+          <div className="lg:hidden space-y-2 sm:space-y-4 max-w-lg mx-auto">
+            {/* Where capsule - Mobile with centered content - Reduced height */}
+            <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-full p-3 sm:p-5 transition-all duration-300 hover:bg-white/15 h-12 sm:h-20">
               <div className="flex items-center justify-center h-full">
-                <div className="flex items-center space-x-3 w-full">
-                  <div className="p-2 bg-gradient-to-br from-rose-400/20 to-rose-600/20 rounded-full flex-shrink-0">
-                    <MapPin className="w-4 h-4 text-rose-300" />
+                <div className="flex items-center space-x-2 sm:space-x-3 w-full">
+                  <div className="p-1.5 sm:p-2 bg-gradient-to-br from-rose-400/20 to-rose-600/20 rounded-full flex-shrink-0">
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-rose-300" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    {filters.where ? (
+                    <div className="text-center">
                       <input
                         type="text"
+                        placeholder="Search destinations"
                         value={filters.where}
                         onChange={(e) =>
                           handleInputChange("where", e.target.value)
                         }
-                        className="w-full bg-transparent text-white border-none outline-none font-medium text-sm sm:text-base text-center"
+                        className="w-full bg-transparent text-white placeholder-white/70 border-none outline-none font-medium text-xs sm:text-base text-center"
                       />
-                    ) : (
-                      <div className="text-center">
-                        <input
-                          type="text"
-                          placeholder="Search destinations"
-                          value={filters.where}
-                          onChange={(e) =>
-                            handleInputChange("where", e.target.value)
-                          }
-                          className="w-full bg-transparent text-white placeholder-white/70 border-none outline-none font-medium text-sm sm:text-base text-center"
-                        />
-                      </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            {/* Date capsules - Mobile Grid - More rounded */}
+            
+            {/* Date capsules - Mobile Grid - Reduced height */}
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <div
-                className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-full p-3 sm:p-4 transition-all duration-300 hover:bg-white/15 h-20 sm:h-24 cursor-pointer relative"
+                className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-full p-2 sm:p-4 transition-all duration-300 hover:bg-white/15 h-16 sm:h-24 cursor-pointer relative"
                 onClick={() => {
                   const input = document.getElementById("checkin-mobile");
                   input.focus();
@@ -372,20 +362,20 @@ const HeroSection = () => {
                   }}
                 />
                 <div className="flex flex-col items-center justify-center text-center h-full pointer-events-none">
-                  <div className="p-1.5 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full mb-2">
-                    <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-300" />
+                  <div className="p-1 sm:p-1.5 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full mb-1 sm:mb-2">
+                    <Calendar className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-blue-300" />
                   </div>
-                  <div className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                  <div className="text-[10px] sm:text-xs font-semibold text-white/60 uppercase tracking-wider mb-0.5 sm:mb-1">
                     Check in
                   </div>
-                  <div className="text-white/50 text-xs">
+                  <div className="text-white/50 text-[10px] sm:text-xs">
                     {filters.checkIn || "Add date"}
                   </div>
                 </div>
               </div>
 
               <div
-                className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-full p-3 sm:p-4 transition-all duration-300 hover:bg-white/15 h-20 sm:h-24 cursor-pointer relative"
+                className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-full p-2 sm:p-4 transition-all duration-300 hover:bg-white/15 h-16 sm:h-24 cursor-pointer relative"
                 onClick={() => {
                   const input = document.getElementById("checkout-mobile");
                   input.focus();
@@ -408,30 +398,31 @@ const HeroSection = () => {
                   }}
                 />
                 <div className="flex flex-col items-center justify-center text-center h-full pointer-events-none">
-                  <div className="p-1.5 bg-gradient-to-br from-purple-400/20 to-purple-600/20 rounded-full mb-2">
-                    <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-300" />
+                  <div className="p-1 sm:p-1.5 bg-gradient-to-br from-purple-400/20 to-purple-600/20 rounded-full mb-1 sm:mb-2">
+                    <Calendar className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-purple-300" />
                   </div>
-                  <div className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                  <div className="text-[10px] sm:text-xs font-semibold text-white/60 uppercase tracking-wider mb-0.5 sm:mb-1">
                     Check out
                   </div>
-                  <div className="text-white/50 text-xs">
+                  <div className="text-white/50 text-[10px] sm:text-xs">
                     {filters.checkOut || "Add date"}
                   </div>
                 </div>
               </div>
             </div>
-            {/* Guests capsule - Mobile */}
-            <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-full p-4 sm:p-5 transition-all duration-300 hover:bg-white/15">
+            
+            {/* Guests capsule - Mobile - Reduced height */}
+            <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-full p-3 sm:p-5 transition-all duration-300 hover:bg-white/15">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-full">
-                    <Users className="w-4 h-4 text-emerald-300" />
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="p-1.5 sm:p-2 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-full">
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-300" />
                   </div>
                   <div>
-                    <div className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                    <div className="text-[10px] sm:text-xs font-semibold text-white/60 uppercase tracking-wider mb-0.5 sm:mb-1">
                       Guests
                     </div>
-                    <div className="text-white font-medium text-sm sm:text-base">
+                    <div className="text-white font-medium text-xs sm:text-base">
                       {filters.guests} guest{filters.guests !== 1 ? "s" : ""}
                     </div>
                   </div>
@@ -443,11 +434,11 @@ const HeroSection = () => {
                       adjustGuests(-1);
                     }}
                     disabled={filters.guests <= 1}
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 border border-white/20 disabled:opacity-50 flex items-center justify-center hover:bg-white/20 transition-all duration-300 text-white font-bold text-sm sm:text-base hover:scale-110"
+                    className="w-6 h-6 sm:w-10 sm:h-10 rounded-full bg-white/10 border border-white/20 disabled:opacity-50 flex items-center justify-center hover:bg-white/20 transition-all duration-300 text-white font-bold text-xs sm:text-base hover:scale-110"
                   >
                     −
                   </button>
-                  <span className="font-bold text-white text-sm sm:text-base w-4 sm:w-6 text-center">
+                  <span className="font-bold text-white text-xs sm:text-base w-4 sm:w-6 text-center">
                     {filters.guests}
                   </span>
                   <button
@@ -455,7 +446,7 @@ const HeroSection = () => {
                       e.stopPropagation();
                       adjustGuests(1);
                     }}
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all duration-300 text-white font-bold text-sm sm:text-base hover:scale-110"
+                    className="w-6 h-6 sm:w-10 sm:h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all duration-300 text-white font-bold text-xs sm:text-base hover:scale-110"
                   >
                     +
                   </button>
@@ -463,12 +454,12 @@ const HeroSection = () => {
               </div>
             </div>
 
-            {/* Search button - Mobile */}
+            {/* Search button - Mobile - Reduced height */}
             <button
               onClick={handleSearch}
-              className="w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white rounded-full py-4 sm:py-5 font-bold text-sm sm:text-base transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-rose-500/25 flex items-center justify-center space-x-2"
+              className="w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white rounded-full py-3 sm:py-5 font-bold text-xs sm:text-base transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-rose-500/25 flex items-center justify-center space-x-2"
             >
-              <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Search className="w-3 h-3 sm:w-5 sm:h-5" />
               <span>Search amazing places</span>
             </button>
           </div>
@@ -476,12 +467,12 @@ const HeroSection = () => {
       </div>
 
       {/* Modern scroll indicator - Updated with click handler */}
-      <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
         <div 
-          className="w-10 h-10 sm:w-14 sm:h-14 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-all duration-300 hover:scale-110"
+          className="w-8 h-8 sm:w-14 sm:h-14 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-all duration-300 hover:scale-110"
           onClick={scrollToFeaturedStays}
         >
-          <ChevronDown className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+          <ChevronDown className="w-3 h-3 sm:w-6 sm:h-6 text-white" />
         </div>
       </div>
 
