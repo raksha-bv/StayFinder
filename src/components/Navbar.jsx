@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import { MapPin, Menu, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = ({ onAuthClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if we're on listings page
+  const isListingsPage = location.pathname === "/listings";
 
   const handleAuthClick = (authType) => {
     setIsMenuOpen(false);
@@ -11,49 +17,89 @@ const Navbar = ({ onAuthClick }) => {
     }
   };
 
+  const handleNavigation = (path) => {
+    setIsMenuOpen(false);
+    navigate(path);
+  };
+
   return (
-    <div className="absolute top-0 left-0 w-full p-4 sm:p-6 z-50">
+    <div
+      className={`fixed top-0 left-0 w-full p-4 sm:p-6 z-50 ${
+        isListingsPage ? "bg-white" : ""
+      }`}
+    >
       <div className="flex justify-between items-center max-w-7xl mx-auto">
         {/* Logo */}
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
-            <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+        <div
+          className="flex items-center space-x-2 sm:space-x-3 cursor-pointer"
+          onClick={() => handleNavigation("/")}
+        >
+          <div
+            className={`w-8 h-8 sm:w-10 sm:h-10 ${
+              isListingsPage ? "bg-red-500" : "bg-white/10 backdrop-blur-sm"
+            } rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg`}
+          >
+            <MapPin
+              className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                isListingsPage ? "text-white" : "text-white"
+              }`}
+            />
           </div>
-          <span className="text-white font-bold text-lg sm:text-2xl tracking-tight">
+          <span
+            className={`${
+              isListingsPage ? "text-gray-900" : "text-white"
+            } font-bold text-lg sm:text-2xl tracking-tight`}
+          >
             StayFinder
           </span>
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-8 text-white/90 text-sm font-medium">
-          <a
-            href="#"
-            className="hover:text-white transition-all duration-300 hover:scale-105"
+        <div
+          className={`hidden md:flex items-center space-x-8 ${
+            isListingsPage ? "text-gray-700" : "text-white/90"
+          } text-sm font-medium`}
+        >
+          <button
+            onClick={() => handleNavigation("/listings")}
+            className={`${
+              isListingsPage ? "hover:text-gray-900" : "hover:text-white"
+            } transition-all duration-300 hover:scale-105`}
           >
-            Host
-          </a>
-          <a
-            href="#"
-            className="hover:text-white transition-all duration-300 hover:scale-105"
+            Listings
+          </button>
+          <button
+            onClick={() => handleNavigation("/experiences")}
+            className={`${
+              isListingsPage ? "hover:text-gray-900" : "hover:text-white"
+            } transition-all duration-300 hover:scale-105`}
           >
             Experiences
-          </a>
-          <a
-            href="#"
-            className="hover:text-white transition-all duration-300 hover:scale-105"
+          </button>
+          <button
+            onClick={() => handleNavigation("/help")}
+            className={`${
+              isListingsPage ? "hover:text-gray-900" : "hover:text-white"
+            } transition-all duration-300 hover:scale-105`}
           >
             Help
-          </a>
+          </button>
           <div className="flex items-center space-x-4 ml-6">
             <button
               onClick={() => handleAuthClick("signup")}
-              className="hover:text-white transition-all duration-300"
+              className={`${
+                isListingsPage ? "hover:text-gray-900" : "hover:text-white"
+              } transition-all duration-300`}
             >
               Sign up
             </button>
             <button
               onClick={() => handleAuthClick("login")}
-              className="bg-white/10 backdrop-blur-sm hover:bg-white/20 px-4 py-2 rounded-full transition-all duration-300"
+              className={`${
+                isListingsPage
+                  ? "bg-gray-900 hover:bg-gray-800 text-white"
+                  : "bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white"
+              } px-4 py-2 rounded-full transition-all duration-300`}
             >
               Log in
             </button>
@@ -63,9 +109,17 @@ const Navbar = ({ onAuthClick }) => {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden bg-white/10 backdrop-blur-sm p-2 rounded-lg text-white"
+          className={`md:hidden ${
+            isListingsPage
+              ? "bg-gray-100 text-gray-900"
+              : "bg-white/10 backdrop-blur-sm text-white"
+          } p-2 rounded-lg`}
         >
-          {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {isMenuOpen ? (
+            <X className="w-5 h-5" />
+          ) : (
+            <Menu className="w-5 h-5" />
+          )}
         </button>
       </div>
 
@@ -77,27 +131,24 @@ const Navbar = ({ onAuthClick }) => {
         >
           <div className="absolute top-20 left-4 right-4 bg-white/95 backdrop-blur-lg rounded-2xl p-6 shadow-2xl border border-white/20">
             <div className="flex flex-col space-y-4 text-gray-800 text-center">
-              <a
-                href="#"
+              <button
+                onClick={() => handleNavigation("/listings")}
                 className="hover:text-gray-600 transition-all duration-300 py-3 text-lg font-medium"
-                onClick={() => setIsMenuOpen(false)}
               >
-                Host
-              </a>
-              <a
-                href="#"
+                Listings
+              </button>
+              <button
+                onClick={() => handleNavigation("/experiences")}
                 className="hover:text-gray-600 transition-all duration-300 py-3 text-lg font-medium"
-                onClick={() => setIsMenuOpen(false)}
               >
                 Experiences
-              </a>
-              <a
-                href="#"
+              </button>
+              <button
+                onClick={() => handleNavigation("/help")}
                 className="hover:text-gray-600 transition-all duration-300 py-3 text-lg font-medium"
-                onClick={() => setIsMenuOpen(false)}
               >
                 Help
-              </a>
+              </button>
               <div className="border-t border-gray-200 pt-4 mt-4">
                 <button
                   onClick={() => handleAuthClick("signup")}

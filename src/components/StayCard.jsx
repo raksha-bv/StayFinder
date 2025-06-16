@@ -39,7 +39,7 @@ const StayCard = ({
   };
 
   return (
-    <div className="w-full bg-white group cursor-pointer">
+    <div className="w-full group cursor-pointer">
       {/* Image Container - Square Aspect Ratio */}
       <div className="relative aspect-square overflow-hidden rounded-xl sm:rounded-2xl">
         {/* Guest Favorite Badge */}
@@ -103,7 +103,7 @@ const StayCard = ({
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content - Now Transparent */}
       <div className="pt-2 sm:pt-3 px-1 sm:px-0">
         {/* Location and Rating */}
         <div className="flex justify-between items-start mb-1">
