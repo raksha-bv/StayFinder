@@ -1,6 +1,6 @@
-import HeroSection from "../components/HeroSection";
-import FeaturedStays from "../components/FeaturedStays";
-import WhyChooseUs from "../components/WhyChooseUs";
+import HeroSection from "../components/LandingPage/HeroSection";
+import FeaturedStays from "../components/LandingPage/FeaturedStays";
+import WhyChooseUs from "../components/LandingPage/WhyChooseUs";
 
 function Landing() {
   return (

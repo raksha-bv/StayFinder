@@ -1,4 +1,4 @@
-import StayCard from "./StayCard";
+import StayCard from "../StayCard";
 
 const FeaturedStays = () => {
   const stays = [
