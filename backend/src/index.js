@@ -18,9 +18,13 @@ const __dirname = path.resolve();
 // Middleware
 app.use(express.json({ limit: "50mb" })); // Increased limit for image uploads
 app.use(cookieParser());
+const allowedOrigins = process.env.FRONTEND_URL
+  ? [process.env.FRONTEND_URL, "http://localhost:5173"]
+  : ["http://localhost:5173", "https://stayfinder-phi.vercel.app"];
+
 app.use(
   cors({
-    origin: "https://stayfinder-phi.vercel.app/",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
