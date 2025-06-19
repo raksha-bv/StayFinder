@@ -5,22 +5,40 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+axiosInstance.interceptors.request.use(
+  (config) => {
+    console.log(
+      "Axios - Making request:",
+      config.method?.toUpperCase(),
+      config.url
+    );
 
-// Add response interceptor to handle 401 errors
-axiosInstance.interceptors.response.use(
-  (response) => response,
+    return config;
+  },
   (error) => {
-    if (error.response?.status === 401) {
-      // Clear invalid token and redirect to login
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+    console.error("Axios - Request error:", error);
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for debugging
+axiosInstance.interceptors.response.use(
+  (response) => {
+    console.log(
+      "Axios - Response received:",
+      response.status,
+      response.config.url
+    );
+
+    return response;
+  },
+  (error) => {
+    // Don't log 401 errors as they're expected when user is not logged in
+    if (error.response?.status !== 401) {
+      console.error("Axios - Response error:", error.message);
+      if (error.code === "ERR_NETWORK") {
+        console.error("Network error - check if backend server is running");
+      }
     }
     return Promise.reject(error);
   }
