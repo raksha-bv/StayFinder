@@ -3,7 +3,18 @@ import User from "../models/user.model.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    // First try to get token from cookies
+    let token = req.cookies.jwt;
+
+    // If no cookie token, check Authorization header
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.substring(7);
+      }
+    }
+
+    console.log("Token found:", token ? "Yes" : "No");
 
     if (!token) {
       return res
@@ -23,12 +34,11 @@ export const protectRoute = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // console.log("Authenticated user:", {
-    //   // Add debug log
-    //   id: user._id,
-    //   email: user.email,
-    //   isHost: user.isHost,
-    // });
+    console.log("Authenticated user:", {
+      id: user._id,
+      email: user.email,
+      isHost: user.isHost,
+    });
 
     req.user = user;
     next();

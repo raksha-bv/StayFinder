@@ -14,7 +14,6 @@ const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
     } catch (error) {
-      // Only log if it's not a 401 (unauthorized) error
       if (error.response?.status !== 401) {
         console.log("Error in checkAuth:", error);
       }
@@ -28,6 +27,15 @@ const useAuthStore = create((set, get) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
+
+      // Store token if returned
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${res.data.token}`;
+      }
+
       set({ authUser: res.data });
       toast.success("Account created successfully");
       return true;
@@ -44,6 +52,15 @@ const useAuthStore = create((set, get) => ({
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
+
+      // Store token from response
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${res.data.token}`;
+      }
+
       set({ authUser: res.data });
       toast.success("Logged in successfully");
       return true;
@@ -59,6 +76,8 @@ const useAuthStore = create((set, get) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
+      localStorage.removeItem("token");
+      delete axiosInstance.defaults.headers.common["Authorization"];
       set({ authUser: null });
       toast.success("Logged out successfully");
     } catch (error) {

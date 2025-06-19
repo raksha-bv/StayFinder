@@ -76,9 +76,11 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    generateToken(user._id, res);
+    const token = generateToken(user._id, res); // This sets cookie
+    
     res.status(200).json({
       message: "User logged in successfully",
+      token: token, // Add this line to return token
       _id: user._id,
       email: user.email,
       firstName: user.firstName,

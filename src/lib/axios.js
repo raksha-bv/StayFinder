@@ -5,6 +5,12 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+// Set token from localStorage on app start
+const token = localStorage.getItem('token');
+if (token) {
+  axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
+
 axiosInstance.interceptors.request.use(
   (config) => {
     console.log(
@@ -33,7 +39,12 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Don't log 401 errors as they're expected when user is not logged in
+    if (error.response?.status === 401) {
+      // Clear token on 401
+      localStorage.removeItem('token');
+      delete axiosInstance.defaults.headers.common['Authorization'];
+    }
+    
     if (error.response?.status !== 401) {
       console.error("Axios - Response error:", error.message);
       if (error.code === "ERR_NETWORK") {

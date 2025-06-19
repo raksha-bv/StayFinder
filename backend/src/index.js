@@ -39,15 +39,6 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({ message: "StayFinder API is running!" });
 });
 
-// Serve static files in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../dist")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "..", "dist", "index.html"));
-  });
-}
-
 app.listen(PORT, () => {
   console.log(`StayFinder server is running on PORT: ${PORT}`);
   connectDB();
