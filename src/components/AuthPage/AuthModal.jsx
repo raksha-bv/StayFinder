@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import MobileAuthLayout from "./MobileAuthLayout";
 import DesktopAuthLayout from "./DesktopAuthLayout";
+import useAuthStore from "../../store/useAuthStore"; // Add this import
 
 const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
   const [isLogin, setIsLogin] = useState(initialMode === "login");
+  const { authUser } = useAuthStore(); // Add this
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -14,7 +16,15 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
     confirmPassword: "",
     rememberMe: false,
     agreeToTerms: false,
+    isHost: false,
   });
+
+  // Close modal when user is authenticated
+  useEffect(() => {
+    if (authUser && isOpen) {
+      onClose();
+    }
+  }, [authUser, isOpen, onClose]);
 
   // Update auth mode when initialMode changes
   useEffect(() => {
@@ -55,7 +65,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    // console.log("Form submitted:", formData);
   };
 
   const toggleAuthMode = () => {
@@ -69,6 +79,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
       confirmPassword: "",
       rememberMe: false,
       agreeToTerms: false,
+      isHost: false,
     });
   };
 

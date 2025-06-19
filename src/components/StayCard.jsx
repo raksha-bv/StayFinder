@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Heart, Star } from "lucide-react";
 
 const StayCard = ({
+  id,
   images = [
     "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
@@ -14,7 +16,12 @@ const StayCard = ({
   price = "₹2,568",
   rating = 4.79,
   isGuestFavorite = true,
+  title,
+  roomType,
+  maxGuests,
+  amenities,
 }) => {
+  const navigate = useNavigate();
   const [currentImage, setCurrentImage] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
@@ -38,8 +45,14 @@ const StayCard = ({
     setIsLiked(!isLiked);
   };
 
+  const handleCardClick = () => {
+    if (id) {
+      navigate(`/listings/${id}`);
+    }
+  };
+
   return (
-    <div className="w-full group cursor-pointer">
+    <div className="w-full group cursor-pointer" onClick={handleCardClick}>
       {/* Image Container - Square Aspect Ratio */}
       <div className="relative aspect-square overflow-hidden rounded-xl sm:rounded-2xl">
         {/* Guest Favorite Badge */}
@@ -57,9 +70,7 @@ const StayCard = ({
           <Heart
             size={14}
             className={`sm:w-4 sm:h-4 transition-all duration-300 ${
-              isLiked
-                ? "fill-red-500 text-red-500"
-                : "text-white"
+              isLiked ? "fill-red-500 text-red-500" : "text-white"
             }`}
           />
         </button>
@@ -67,7 +78,7 @@ const StayCard = ({
         {/* Image */}
         <img
           src={images[currentImage]}
-          alt={`${location} accommodation`}
+          alt={title || `${location} accommodation`}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           loading="lazy"
         />
@@ -93,9 +104,7 @@ const StayCard = ({
               key={index}
               onClick={(e) => goToImage(index, e)}
               className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full transition-all duration-300 ${
-                index === currentImage
-                  ? "bg-white"
-                  : "bg-white/60"
+                index === currentImage ? "bg-white" : "bg-white/60"
               }`}
               aria-label={`Go to image ${index + 1}`}
             />
@@ -114,19 +123,27 @@ const StayCard = ({
           </div>
           <div className="flex items-center space-x-1 ml-2">
             <Star size={10} className="sm:w-3 sm:h-3 text-black fill-current" />
-            <span className="text-xs sm:text-sm font-medium text-gray-900">{rating}</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-900">
+              {rating}
+            </span>
           </div>
         </div>
 
         {/* Area - Hidden on smaller screens */}
-        <p className="text-gray-500 text-xs sm:text-sm mb-1 truncate hidden sm:block">{area}</p>
+        <p className="text-gray-500 text-xs sm:text-sm mb-1 truncate hidden sm:block">
+          {area}
+        </p>
 
         {/* Dates - Hidden on smaller screens */}
-        <p className="text-gray-500 text-xs sm:text-sm mb-1 sm:mb-2 hidden sm:block">{dates}</p>
+        <p className="text-gray-500 text-xs sm:text-sm mb-1 sm:mb-2 hidden sm:block">
+          {dates}
+        </p>
 
         {/* Price - Hidden on smaller screens */}
         <div className="flex items-baseline space-x-1 hidden sm:flex">
-          <span className="text-xs sm:text-sm font-semibold text-gray-900">{price}</span>
+          <span className="text-xs sm:text-sm font-semibold text-gray-900">
+            {price}
+          </span>
           <span className="text-gray-500 text-xs sm:text-sm">night</span>
         </div>
       </div>

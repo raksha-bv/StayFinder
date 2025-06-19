@@ -4,6 +4,7 @@ import LocationSearch from "./LocationSearch";
 import DateSearch from "./DateSearch";
 import GuestSearch from "./GuestSearch";
 import SortDropdown from "./SortDropdown";
+import HostActions from "./HostActions";
 
 const SearchBar = ({
   filters,
@@ -172,6 +173,7 @@ const SearchBar = ({
               sortOptions={sortOptions}
               isMobile={true}
             />
+            <HostActions />
           </div>
         </div>
 
@@ -240,6 +242,7 @@ const SearchBar = ({
             sortOptions={sortOptions}
             isMobile={false}
           />
+          <HostActions />
         </div>
       </div>
     </div>

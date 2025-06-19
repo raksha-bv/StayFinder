@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import InputField from "./InputField";
-import { Mail, Lock, User, Phone } from "lucide-react";
+import { Mail, Lock, User, Phone, Home, UserCheck } from "lucide-react";
+import useAuthStore from "../../store/useAuthStore";
+import toast from "react-hot-toast";
 
 const AuthForm = ({
   isLogin,
@@ -12,6 +14,43 @@ const AuthForm = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { signup, login, isSigningUp, isLoggingIn } = useAuthStore();
+
+  // Update the onSubmit to use the auth store
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (isLogin) {
+      const loginData = {
+        email: formData.email,
+        password: formData.password,
+      };
+      // console.log("Sending login data:", loginData);
+      await login(loginData);
+    } else {
+      const signupData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        isHost: formData.isHost,
+      };
+      // console.log("Sending signup data:", signupData);
+      const success = await signup(signupData);
+
+      // If signup is successful, switch to login mode
+      if (success !== false) {
+        toast.success("Account created! Please sign in to continue.");
+        onToggleAuthMode();
+      }
+    }
+  };
 
   const inputClass = isMobile
     ? "w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-colors text-sm"
@@ -25,9 +64,50 @@ const AuthForm = ({
 
   return (
     <form
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       className={isMobile ? "space-y-4" : "space-y-4 xl:space-y-6"}
     >
+      {/* Host/Guest Toggle Switch */}
+      <div className={`${isMobile ? "mb-4" : "mb-4 xl:mb-6"}`}>
+        <div className="flex items-center justify-center">
+          <div className="bg-gray-100 p-1 rounded-lg flex items-center">
+            <button
+              type="button"
+              onClick={() => onInputChange("isHost", false)}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-all duration-200 ${
+                !formData.isHost
+                  ? "bg-white text-rose-600 shadow-sm"
+                  : "text-gray-600"
+              } ${isMobile ? "text-xs" : "text-sm"}`}
+            >
+              <UserCheck className={iconSize} />
+              <span>Guest</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onInputChange("isHost", true)}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-all duration-200 ${
+                formData.isHost
+                  ? "bg-white text-rose-600 shadow-sm"
+                  : "text-gray-600"
+              } ${isMobile ? "text-xs" : "text-sm"}`}
+            >
+              <Home className={iconSize} />
+              <span>Host</span>
+            </button>
+          </div>
+        </div>
+        <p
+          className={`text-center text-gray-500 mt-2 ${
+            isMobile ? "text-xs" : "text-xs xl:text-sm"
+          }`}
+        >
+          {formData.isHost
+            ? "Join as a host to list your property"
+            : "Join as a guest to book amazing stays"}
+        </p>
+      </div>
+
       {!isLogin && (
         <div
           className={
@@ -171,11 +251,20 @@ const AuthForm = ({
 
       <button
         type="submit"
-        className={`w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-lg font-semibold hover:from-rose-600 hover:to-rose-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg ${
+        disabled={isLogin ? isLoggingIn : isSigningUp}
+        className={`w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-lg font-semibold hover:from-rose-600 hover:to-rose-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
           isMobile ? "py-3 text-sm mt-4" : "py-3 xl:py-4 text-sm xl:text-base"
         }`}
       >
-        {isLogin ? "Sign In" : "Create Account"}
+        {isLogin
+          ? isLoggingIn
+            ? "Signing In..."
+            : "Sign In"
+          : isSigningUp
+          ? "Creating Account..."
+          : formData.isHost
+          ? "Start Hosting"
+          : "Create Account"}
       </button>
 
       <div className={isMobile ? "text-center pt-3" : "text-center"}>

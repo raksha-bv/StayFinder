@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SearchBar from "../components/ListingsPage/SearchBar";
 import ListingsGrid from "../components/ListingsPage/ListingsGrid";
+import useListingStore from "../store/useListingStore";
 
 const ListingsPage = () => {
   const [filters, setFilters] = useState({
@@ -12,8 +13,44 @@ const ListingsPage = () => {
     dateRange: [null, null],
   });
 
+  // Get listings and functions from Zustand store
+  const {
+    listings,
+    isLoading,
+    pagination,
+    getListings,
+    getFilteredListings,
+    setFilters: setStoreFilters,
+    clearFilters,
+  } = useListingStore();
+
+  // Add debugging
+  console.log("ListingsPage - listings:", listings);
+  console.log("ListingsPage - isLoading:", isLoading);
+  console.log("ListingsPage - pagination:", pagination);
+
+  // Load listings on component mount
+  useEffect(() => {
+    console.log("ListingsPage - useEffect triggered, calling getListings");
+    getListings()
+      .then(() => {
+        console.log("ListingsPage - getListings completed");
+      })
+      .catch((error) => {
+        console.error("ListingsPage - getListings error:", error);
+      });
+  }, []); // Remove getListings from dependency array to prevent infinite loop
+
   const handleInputChange = (field, value) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
+
+    // Update store filters based on search form
+    if (field === "where") {
+      setStoreFilters({ city: value });
+    }
+    if (field === "guests") {
+      setStoreFilters({ guests: value });
+    }
   };
 
   const adjustGuests = (field, increment) => {
@@ -21,11 +58,26 @@ const ListingsPage = () => {
       ...prev,
       [field]: Math.max(0, prev[field] + increment),
     }));
+
+    // Update total guests in store
+    const totalGuests = Math.max(
+      0,
+      filters.guests + (field === "guests" ? increment : 0)
+    );
+    setStoreFilters({ guests: totalGuests });
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     console.log("Search filters:", filters);
-    // Add your search logic here
+
+    // Convert form filters to store filters format
+    const storeFilters = {
+      city: filters.where,
+      guests: filters.guests + filters.children,
+    };
+
+    setStoreFilters(storeFilters);
+    await getFilteredListings(1);
   };
 
   const handleDateChange = (value) => {
@@ -50,154 +102,12 @@ const ListingsPage = () => {
     // This will be handled by the SearchBar component
   };
 
-  // Sample data for stays
-  const stays = [
-    {
-      images: [
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-      ],
-      location: "Kollam, India",
-      area: "Kollam beach",
-      dates: "9-15 Jan",
-      price: "₹2,568",
-      rating: 4.79,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-      ],
-      location: "Goa, India",
-      area: "Baga Beach",
-      dates: "12-18 Jan",
-      price: "₹3,200",
-      rating: 4.85,
-      isGuestFavorite: false,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-      ],
-      location: "Mumbai, India",
-      area: "Marine Drive",
-      dates: "5-10 Feb",
-      price: "₹4,500",
-      rating: 4.92,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=400&fit=crop",
-      ],
-      location: "Kerala, India",
-      area: "Backwaters",
-      dates: "20-25 Jan",
-      price: "₹1,800",
-      rating: 4.67,
-      isGuestFavorite: false,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-      ],
-      location: "Udaipur, India",
-      area: "City Palace",
-      dates: "15-20 Mar",
-      price: "₹3,800",
-      rating: 4.88,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-      ],
-      location: "Jaipur, India",
-      area: "Pink City",
-      dates: "8-14 Feb",
-      price: "₹2,900",
-      rating: 4.71,
-      isGuestFavorite: false,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-      ],
-      location: "Manali, India",
-      area: "Old Manali",
-      dates: "22-28 Jan",
-      price: "₹2,200",
-      rating: 4.73,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=400&fit=crop",
-      ],
-      location: "Rishikesh, India",
-      area: "Ganges Side",
-      dates: "3-9 Mar",
-      price: "₹1,600",
-      rating: 4.65,
-      isGuestFavorite: false,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-      ],
-      location: "Shimla, India",
-      area: "Mall Road",
-      dates: "18-24 Feb",
-      price: "₹2,700",
-      rating: 4.81,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-      ],
-      location: "Agra, India",
-      area: "Taj Mahal Area",
-      dates: "10-15 Apr",
-      price: "₹3,100",
-      rating: 4.77,
-      isGuestFavorite: false,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-      ],
-      location: "Darjeeling, India",
-      area: "Tiger Hill",
-      dates: "25-30 Mar",
-      price: "₹2,000",
-      rating: 4.69,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=400&fit=crop",
-      ],
-      location: "Varanasi, India",
-      area: "Ghats",
-      dates: "6-12 Apr",
-      price: "₹1,900",
-      rating: 4.63,
-      isGuestFavorite: false,
-    },
-  ];
+  // Load more listings for pagination
+  const handleLoadMore = async () => {
+    if (pagination.currentPage < pagination.totalPages) {
+      await getFilteredListings(pagination.currentPage + 1);
+    }
+  };
 
   const sortOptions = [
     { value: "recommended", label: "Recommended" },
@@ -220,9 +130,12 @@ const ListingsPage = () => {
       />
 
       <ListingsGrid
-        stays={stays}
+        stays={listings}
         sortBy="recommended"
         sortOptions={sortOptions}
+        isLoading={isLoading}
+        pagination={pagination}
+        onLoadMore={handleLoadMore}
       />
     </div>
   );
