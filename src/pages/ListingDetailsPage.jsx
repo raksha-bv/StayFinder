@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -22,9 +22,12 @@ import {
   Facebook,
   Twitter,
   MessageCircle,
+  ChevronDown,
 } from "lucide-react";
 import useListingStore from "../store/useListingStore";
 import useBookingStore from "../store/useBookingStore";
+import DateRangeCalendar from "../components/DateRangeCalendar";
+import GuestSearch from "../components/ListingsPage/GuestSearch";
 import toast from "react-hot-toast";
 
 const ListingDetailsPage = () => {
@@ -33,15 +36,25 @@ const ListingDetailsPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
+  
+  // Date and Guest state
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const [guests, setGuests] = useState({
-    adults: 1,
+    guests: 1,
     children: 0,
   });
+  
   const [specialRequests, setSpecialRequests] = useState("");
   const [totalAmount, setTotalAmount] = useState(0);
   const [nights, setNights] = useState(0);
+
+  // Refs for dropdowns
+  const calendarDropdownRef = useRef(null);
+  const calendarTriggerRef = useRef(null);
+  const guestDropdownRef = useRef(null);
+  const guestTriggerRef = useRef(null);
 
   const { currentListing, isLoading, getListingById } = useListingStore();
   const {
@@ -63,9 +76,9 @@ const ListingDetailsPage = () => {
 
   // Calculate total amount and nights when dates change
   useEffect(() => {
-    if (checkIn && checkOut && currentListing) {
-      const checkInDate = new Date(checkIn);
-      const checkOutDate = new Date(checkOut);
+    if (dateRange[0] && dateRange[1] && currentListing) {
+      const checkInDate = new Date(dateRange[0]);
+      const checkOutDate = new Date(dateRange[1]);
 
       if (checkOutDate > checkInDate) {
         const calculatedNights = Math.ceil(
@@ -83,20 +96,46 @@ const ListingDetailsPage = () => {
       setNights(0);
       setTotalAmount(0);
     }
-  }, [checkIn, checkOut, currentListing]);
+  }, [dateRange, currentListing]);
 
   // Check availability when dates change
   useEffect(() => {
-    if (checkIn && checkOut && id) {
+    if (dateRange[0] && dateRange[1] && id) {
       const timeoutId = setTimeout(() => {
         handleCheckAvailability();
-      }, 500); // Debounce the availability check
+      }, 500);
 
       return () => clearTimeout(timeoutId);
     } else {
       clearAvailability();
     }
-  }, [checkIn, checkOut, id]);
+  }, [dateRange, id]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        calendarDropdownRef.current &&
+        !calendarDropdownRef.current.contains(event.target) &&
+        calendarTriggerRef.current &&
+        !calendarTriggerRef.current.contains(event.target)
+      ) {
+        setShowCalendar(false);
+      }
+
+      if (
+        guestDropdownRef.current &&
+        !guestDropdownRef.current.contains(event.target) &&
+        guestTriggerRef.current &&
+        !guestTriggerRef.current.contains(event.target)
+      ) {
+        setShowGuestDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const amenityIcons = {
     wifi: Wifi,
@@ -120,8 +159,31 @@ const ListingDetailsPage = () => {
     }
   };
 
+  const handleDateChange = (range) => {
+    setDateRange(range);
+  };
+
+  const handleCloseCalendar = () => {
+    setShowCalendar(false);
+  };
+
+  const handleClearDates = () => {
+    setDateRange([null, null]);
+    clearAvailability();
+  };
+
+  const adjustGuests = (type, increment) => {
+    setGuests(prev => ({
+      ...prev,
+      [type]: Math.max(type === 'guests' ? 1 : 0, prev[type] + increment)
+    }));
+  };
+
   const handleCheckAvailability = async () => {
-    if (!checkIn || !checkOut || !id) return;
+    if (!dateRange[0] || !dateRange[1] || !id) return;
+
+    const checkIn = dateRange[0].toISOString().split('T')[0];
+    const checkOut = dateRange[1].toISOString().split('T')[0];
 
     const dateValidation = validateBookingDates(checkIn, checkOut);
     if (!dateValidation.valid) {
@@ -129,6 +191,29 @@ const ListingDetailsPage = () => {
     }
 
     await checkAvailability(id, checkIn, checkOut);
+  };
+
+  const formatDateRange = () => {
+    if (!dateRange || !dateRange[0]) return "Add dates";
+
+    if (dateRange[0] && dateRange[1]) {
+      const startDate = dateRange[0].toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      const endDate = dateRange[1].toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      return `${startDate} - ${endDate}`;
+    } else if (dateRange[0]) {
+      return dateRange[0].toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+    }
+
+    return "Add dates";
   };
 
   const handleShare = () => {
@@ -142,7 +227,6 @@ const ListingDetailsPage = () => {
       toast.success("Link copied to clipboard!");
       setShowShareModal(false);
     } catch (err) {
-      // Fallback for older browsers
       const textArea = document.createElement("textarea");
       textArea.value = currentUrl;
       document.body.appendChild(textArea);
@@ -196,53 +280,51 @@ const ListingDetailsPage = () => {
       } catch (err) {
         if (err.name !== "AbortError") {
           console.error("Error sharing:", err);
-          copyToClipboard(); // Fallback to copy
+          copyToClipboard();
         }
       }
     } else {
-      copyToClipboard(); // Fallback if native share is not supported
+      copyToClipboard();
     }
   };
 
   const handleReserve = async () => {
-    // Validate form data
-    if (!checkIn || !checkOut) {
+    if (!dateRange[0] || !dateRange[1]) {
       toast.error("Please select check-in and check-out dates");
       return;
     }
 
-    if (!guests.adults || guests.adults < 1) {
+    if (!guests.guests || guests.guests < 1) {
       toast.error("At least 1 adult guest is required");
       return;
     }
 
-    // Validate dates
+    const checkIn = dateRange[0].toISOString().split('T')[0];
+    const checkOut = dateRange[1].toISOString().split('T')[0];
+
     const dateValidation = validateBookingDates(checkIn, checkOut);
     if (!dateValidation.valid) {
       toast.error(dateValidation.message);
       return;
     }
 
-    // Check if dates are available
     if (availability && !availability.available) {
       toast.error("Selected dates are not available");
       return;
     }
 
-    // Validate guest count
-    const totalGuests = guests.adults + guests.children;
+    const totalGuests = guests.guests + guests.children;
     if (totalGuests > currentListing.capacity?.guests) {
       toast.error(`Maximum ${currentListing.capacity.guests} guests allowed`);
       return;
     }
 
-    // Create booking data
     const bookingData = {
       listingId: id,
       checkIn,
       checkOut,
       guests: {
-        adults: guests.adults,
+        adults: guests.guests,
         children: guests.children,
       },
       specialRequests: specialRequests.trim(),
@@ -254,16 +336,13 @@ const ListingDetailsPage = () => {
       if (booking) {
         toast.success("Booking created successfully!");
         
-        // Reset form
-        setCheckIn("");
-        setCheckOut("");
-        setGuests({ adults: 1, children: 0 });
+        setDateRange([null, null]);
+        setGuests({ guests: 1, children: 0 });
         setSpecialRequests("");
         setTotalAmount(0);
         setNights(0);
         clearAvailability();
         
-        // Redirect to booking confirmation page
         navigate(`/booking-confirmation/${booking._id}`);
       }
     } catch (error) {
@@ -283,17 +362,6 @@ const ListingDetailsPage = () => {
 
   const formatPropertyType = (propertyType) => {
     return propertyType.charAt(0).toUpperCase() + propertyType.slice(1);
-  };
-
-  const getTodayDate = () => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
-  };
-
-  const getTomorrowDate = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split("T")[0];
   };
 
   if (isLoading) {
@@ -351,7 +419,6 @@ const ListingDetailsPage = () => {
             </div>
 
             <div className="space-y-4">
-              {/* Native Share (if supported) */}
               {navigator.share && (
                 <button
                   onClick={nativeShare}
@@ -362,7 +429,6 @@ const ListingDetailsPage = () => {
                 </button>
               )}
 
-              {/* Copy Link */}
               <button
                 onClick={copyToClipboard}
                 className="w-full flex items-center space-x-3 p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
@@ -371,7 +437,6 @@ const ListingDetailsPage = () => {
                 <span className="text-gray-700">Copy link</span>
               </button>
 
-              {/* Social Media Options */}
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => shareOnSocial("facebook")}
@@ -479,7 +544,6 @@ const ListingDetailsPage = () => {
                     </>
                   )}
 
-                  {/* Image Counter */}
                   <div className="absolute bottom-3 right-3 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
                     {currentImageIndex + 1} / {currentListing.images.length}
                   </div>
@@ -487,7 +551,6 @@ const ListingDetailsPage = () => {
               )}
             </div>
 
-            {/* Thumbnail Gallery */}
             {currentListing.images && currentListing.images.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
                 {currentListing.images.slice(0, 4).map((image, index) => (
@@ -602,83 +665,168 @@ const ListingDetailsPage = () => {
                 <span className="text-gray-600">night</span>
               </div>
 
-              {/* Date Inputs */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Check-in
-                  </label>
-                  <input
-                    type="date"
-                    value={checkIn}
-                    min={getTodayDate()}
-                    onChange={(e) => setCheckIn(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                  />
+              {/* Date Selection */}
+              <div className="relative">
+                <div
+                  ref={calendarTriggerRef}
+                  className={`cursor-pointer hover:bg-gray-100 transition-all duration-300 px-4 py-3 rounded-xl border border-gray-200 ${
+                    showCalendar ? "border-gray-300 bg-gray-100" : ""
+                  }`}
+                  onClick={() => setShowCalendar(!showCalendar)}
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="p-2 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-lg">
+                      <Calendar className="text-blue-500 h-4 w-4" />
+                    </div>
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="font-semibold text-gray-500 uppercase tracking-wide text-xs mb-1">
+                        When
+                      </div>
+                      <div className="text-gray-900 font-medium text-sm">
+                        {formatDateRange()}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Check-out
-                  </label>
-                  <input
-                    type="date"
-                    value={checkOut}
-                    min={checkIn || getTomorrowDate()}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                  />
-                </div>
+
+                {/* Calendar Dropdown */}
+                {showCalendar && (
+                  <div
+                    ref={calendarDropdownRef}
+                    className="absolute top-full mt-2 z-50"
+                    style={{
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      maxWidth: "90vw",
+                    }}
+                  >
+                    <DateRangeCalendar
+                      dateRange={dateRange}
+                      onDateChange={handleDateChange}
+                      onClose={handleCloseCalendar}
+                      onClear={handleClearDates}
+                      minDate={new Date()}
+                      showDoubleView={window.innerWidth > 768}
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* Guests */}
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Adults
-                  </label>
-                  <select
-                    value={guests.adults}
-                    onChange={(e) =>
-                      setGuests({ ...guests, adults: parseInt(e.target.value) })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                  >
-                    {Array.from(
-                      { length: currentListing.capacity?.guests || 8 },
-                      (_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1} {i === 0 ? "adult" : "adults"}
-                        </option>
-                      )
-                    )}
-                  </select>
+              {/* Guest Selection */}
+              <div className="relative">
+                <div
+                  ref={guestTriggerRef}
+                  className={`cursor-pointer hover:bg-gray-100 transition-all duration-300 px-4 py-3 rounded-xl border border-gray-200 ${
+                    showGuestDropdown ? "border-gray-300 bg-gray-100" : ""
+                  }`}
+                  onClick={() => setShowGuestDropdown(!showGuestDropdown)}
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="p-2 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-lg">
+                      <Users className="text-emerald-500 h-4 w-4" />
+                    </div>
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="font-semibold text-gray-500 uppercase tracking-wide text-xs mb-1">
+                        Who
+                      </div>
+                      <div className="text-gray-900 font-medium text-sm">
+                        {guests.guests + guests.children === 1
+                          ? "1 guest"
+                          : `${guests.guests + guests.children} guests`}
+                      </div>
+                    </div>
+                    <ChevronDown
+                      className={`text-gray-400 transition-transform duration-300 w-4 h-4 ${
+                        showGuestDropdown ? "rotate-180" : ""
+                      }`}
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Children (optional)
-                  </label>
-                  <select
-                    value={guests.children}
-                    onChange={(e) =>
-                      setGuests({ ...guests, children: parseInt(e.target.value) })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                {/* Guests Dropdown */}
+                {showGuestDropdown && (
+                  <div
+                    ref={guestDropdownRef}
+                    className="absolute top-full mt-2 bg-white shadow-xl border border-gray-100 z-50 animate-in slide-in-from-top-2 duration-300 right-0 w-80 rounded-3xl p-6"
+                    style={{
+                      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+                      backdropFilter: "blur(20px)",
+                      background: "rgba(255, 255, 255, 0.98)",
+                    }}
                   >
-                    {Array.from(
-                      {
-                        length:
-                          Math.max(0, (currentListing.capacity?.guests || 8) -
-                          guests.adults) + 1,
-                      },
-                      (_, i) => (
-                        <option key={i} value={i}>
-                          {i} {i === 1 ? "child" : "children"}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
+                    {/* Adults */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <span className="text-gray-800 font-semibold text-lg">
+                          Adults
+                        </span>
+                        <p className="text-gray-500 text-sm">
+                          Ages 13 or above
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            adjustGuests("guests", -1);
+                          }}
+                          disabled={guests.guests <= 1}
+                          className="rounded-full border-2 border-gray-300 disabled:border-gray-200 disabled:text-gray-300 flex items-center justify-center hover:border-red-400 hover:text-red-500 transition-all duration-300 font-semibold text-gray-600 w-10 h-10 hover:scale-110 disabled:hover:scale-100"
+                        >
+                          −
+                        </button>
+                        <span className="font-bold text-gray-800 text-center text-lg w-8">
+                          {guests.guests}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            adjustGuests("guests", 1);
+                          }}
+                          className="rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-red-400 hover:text-red-500 transition-all duration-300 font-semibold text-gray-600 w-10 h-10 hover:scale-110"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Children */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-gray-800 font-semibold text-lg">
+                          Children
+                        </span>
+                        <p className="text-gray-500 text-sm">
+                          Ages 2-12
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            adjustGuests("children", -1);
+                          }}
+                          disabled={guests.children <= 0}
+                          className="rounded-full border-2 border-gray-300 disabled:border-gray-200 disabled:text-gray-300 flex items-center justify-center hover:border-red-400 hover:text-red-500 transition-all duration-300 font-semibold text-gray-600 w-10 h-10 hover:scale-110 disabled:hover:scale-100"
+                        >
+                          −
+                        </button>
+                        <span className="font-bold text-gray-800 text-center text-lg w-8">
+                          {guests.children}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            adjustGuests("children", 1);
+                          }}
+                          className="rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-red-400 hover:text-red-500 transition-all duration-300 font-semibold text-gray-600 w-10 h-10 hover:scale-110"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Special Requests */}
@@ -700,7 +848,7 @@ const ListingDetailsPage = () => {
               </div>
 
               {/* Availability Status */}
-              {checkIn && checkOut && (
+              {dateRange[0] && dateRange[1] && (
                 <div className="space-y-2">
                   {isCheckingAvailability ? (
                     <div className="flex items-center space-x-2 text-gray-600">
@@ -748,8 +896,8 @@ const ListingDetailsPage = () => {
                 onClick={handleReserve}
                 disabled={
                   isCreating ||
-                  !checkIn ||
-                  !checkOut ||
+                  !dateRange[0] ||
+                  !dateRange[1] ||
                   (availability && !availability.available) ||
                   isCheckingAvailability
                 }

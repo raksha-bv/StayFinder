@@ -5,44 +5,23 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// Add request interceptor for debugging (only in development)
-// axiosInstance.interceptors.request.use(
-//   (config) => {
-//     if (process.env.NODE_ENV === "development") {
-//       console.log(
-//         "Axios - Making request:",
-//         config.method?.toUpperCase(),
-//         config.url
-//       );
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     console.error("Axios - Request error:", error);
-//     return Promise.reject(error);
-//   }
-// );
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-// // Add response interceptor for debugging
-// axiosInstance.interceptors.response.use(
-//   (response) => {
-//     if (process.env.NODE_ENV === "development") {
-//       console.log(
-//         "Axios - Response received:",
-//         response.status,
-//         response.config.url
-//       );
-//     }
-//     return response;
-//   },
-//   (error) => {
-//     // Don't log 401 errors as they're expected when user is not logged in
-//     if (error.response?.status !== 401) {
-//       console.error("Axios - Response error:", error.message);
-//       if (error.code === "ERR_NETWORK") {
-//         console.error("Network error - check if backend server is running");
-//       }
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+// Add response interceptor to handle 401 errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear invalid token and redirect to login
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
