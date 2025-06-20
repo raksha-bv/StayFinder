@@ -1,151 +1,91 @@
+import { useEffect } from "react";
 import StayCard from "../StayCard";
+import useListingStore from "../../store/useListingStore";
 
 const FeaturedStays = () => {
-  const stays = [
-    {
-      images: [
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-      ],
-      location: "Kollam, India",
-      area: "Kollam beach",
-      dates: "9-15 Jan",
-      price: "₹2,568",
-      rating: 4.79,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1586611292717-f828b167408c?w=400&h=400&fit=crop",
-      ],
-      location: "Vypin, India",
-      area: "Vypin beach",
-      dates: "9-15 Jan",
-      price: "₹2,568",
-      rating: 4.79,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-      ],
-      location: "Munnar, India",
-      area: "Tea gardens",
-      dates: "16-22 Jan",
-      price: "₹3,200",
-      rating: 4.85,
-      isGuestFavorite: false,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-      ],
-      location: "Goa, India",
-      area: "Anjuna beach",
-      dates: "23-29 Jan",
-      price: "₹4,100",
-      rating: 4.92,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=400&fit=crop",
-      ],
-      location: "Alleppey, India",
-      area: "Backwaters",
-      dates: "30 Jan-5 Feb",
-      price: "₹2,890",
-      rating: 4.76,
-      isGuestFavorite: false,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1540541338287-41700207dee6?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-      ],
-      location: "Udaipur, India",
-      area: "Lake Palace area",
-      dates: "6-12 Feb",
-      price: "₹5,200",
-      rating: 4.88,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1502005229762-cf1b2da2db52?w=400&h=400&fit=crop",
-      ],
-      location: "Jaipur, India",
-      area: "Pink City",
-      dates: "13-19 Feb",
-      price: "₹3,750",
-      rating: 4.83,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-      ],
-      location: "Rishikesh, India",
-      area: "Ganges riverside",
-      dates: "20-26 Feb",
-      price: "₹2,200",
-      rating: 4.71,
-      isGuestFavorite: false,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-      ],
-      location: "Coorg, India",
-      area: "Coffee plantations",
-      dates: "27 Feb-5 Mar",
-      price: "₹3,450",
-      rating: 4.91,
-      isGuestFavorite: true,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=400&fit=crop",
-      ],
-      location: "Hampi, India",
-      area: "Historical ruins",
-      dates: "6-12 Mar",
-      price: "₹1,890",
-      rating: 4.67,
-      isGuestFavorite: false,
-    },
-    {
-      images: [
-        "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=400&fit=crop",
-      ],
-      location: "Shimla, India",
-      area: "Hill station",
-      dates: "13-19 Mar",
-      price: "₹2,980",
-      rating: 4.74,
-      isGuestFavorite: true,
-    },
-  ];
+  // Get listings and functions from Zustand store
+  const {
+    listings,
+    isLoading,
+    getListings,
+    setFilters,
+    setSortBy,
+  } = useListingStore();
+
+  useEffect(() => {
+    // Clear any existing filters and set sort to recommended for featured stays
+    setFilters({
+      city: "",
+      country: "",
+      propertyType: "",
+      roomType: "",
+      minPrice: "",
+      maxPrice: "",
+      guests: "",
+      amenities: [],
+      checkIn: "",
+      checkOut: "",
+    });
+    
+    setSortBy("recommended");
+    
+    // Fetch featured listings when component mounts
+    getListings(1, {}, "recommended");
+  }, [getListings, setFilters, setSortBy]);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <section className="py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
+        <div className="scrolling-container mb-4 sm:mb-6 md:mb-8">
+          <div className="horizontal-scrolling-items bebas-neue-regular">
+            <div className="horizontal-scrolling-items__item">
+              FEATURED STAYS • FEATURED STAYS • FEATURED STAYS • FEATURED STAYS •
+              FEATURED STAYS • FEATURED STAYS • FEATURED STAYS • FEATURED STAYS
+              •&nbsp;
+            </div>
+            <div className="horizontal-scrolling-items__item">
+              FEATURED STAYS • FEATURED STAYS • FEATURED STAYS • FEATURED STAYS •
+              FEATURED STAYS • FEATURED STAYS • FEATURED STAYS • FEATURED STAYS
+              •&nbsp;
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-500">Loading featured stays...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // Transform listing data to match StayCard props
+  const transformedListings = listings.map((listing) => {
+    // Handle rating properly - ensure it's always a number
+    let ratingValue = 4.5; // default value
+    if (listing.rating) {
+      if (typeof listing.rating === 'object' && listing.rating.average) {
+        ratingValue = listing.rating.average;
+      } else if (typeof listing.rating === 'number') {
+        ratingValue = listing.rating;
+      }
+    }
+
+    return {
+      id: listing._id,
+      images: listing.images?.map((img) => img.url) || [],
+      location: `${listing.address?.city || listing.location?.city || ""}, ${listing.address?.country || listing.location?.country || ""}`,
+      area: listing.address?.area || listing.location?.address || listing.propertyType,
+      dates: listing.availability ? "Available" : "Check dates",
+      price: `₹${listing.pricePerNight || listing.pricing?.basePrice || 0}`,
+      rating: ratingValue,
+      isGuestFavorite: listing.featured || listing.isGuestFavorite || false,
+      title: listing.title,
+      propertyType: listing.propertyType,
+      roomType: listing.roomType,
+      maxGuests: listing.capacity?.guests,
+      amenities: listing.amenities,
+    };
+  });
 
   return (
     <section
@@ -167,20 +107,26 @@ const FeaturedStays = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto scrollbar-hide">
-        <div className="flex space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 pb-4">
-          {stays.map((stay, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0 w-40 xs:w-44 sm:w-52 md:w-60 lg:w-72 xl:w-80"
-            >
-              <StayCard {...stay} />
-            </div>
-          ))}
+      {transformedListings.length > 0 ? (
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 pb-4">
+            {transformedListings.map((stay) => (
+              <div
+                key={stay.id}
+                className="flex-shrink-0 w-40 xs:w-44 sm:w-52 md:w-60 lg:w-72 xl:w-80"
+              >
+                <StayCard {...stay} />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-500">No featured stays available</div>
+        </div>
+      )}
 
-      <style jsx>{`
+      <style jsx={true}>{`
         @keyframes infiniteScroll {
           from {
             transform: translateX(0);
