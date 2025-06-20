@@ -22,6 +22,8 @@ const useListingStore = create((set, get) => ({
     maxPrice: "",
     guests: "",
     amenities: [],
+    checkIn: "",
+    checkOut: "",
   },
   pagination: {
     currentPage: 1,
@@ -29,29 +31,26 @@ const useListingStore = create((set, get) => ({
     totalListings: 0,
     limit: 10,
   },
+  sortBy: "recommended",
 
-  // Get all listings with filters
-  getListings: async (page = 1, filters = {}) => {
-    console.log("Store - getListings called with:", { page, filters });
+  // Get all listings with filters and sorting
+  getListings: async (page = 1, filters = {}, sortBy = "recommended") => {
+    console.log("Store - getListings called with:", { page, filters, sortBy });
     set({ isLoading: true });
 
     try {
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: get().pagination.limit.toString(),
-        ...filters,
+        sortBy: sortBy,
       });
 
-      // Remove empty values
-      for (const [key, value] of queryParams.entries()) {
-        if (
-          !value ||
-          value === "" ||
-          (Array.isArray(value) && value.length === 0)
-        ) {
-          queryParams.delete(key);
+      // Add filters to query params
+      Object.keys(filters).forEach((key) => {
+        if (filters[key] && filters[key] !== "" && filters[key].length > 0) {
+          queryParams.set(key, filters[key]);
         }
-      }
+      });
 
       const url = `/listings?${queryParams}`;
       console.log("Store - Making request to:", url);
@@ -59,30 +58,54 @@ const useListingStore = create((set, get) => ({
       const res = await axiosInstance.get(url);
       console.log("Store - API response:", res.data);
 
+      // Get current listings and decide whether to replace or append
+      const currentListings = get().listings;
+      let newListings;
+
+      if (page === 1) {
+        // Replace listings for new search/sort
+        newListings = res.data.listings;
+        console.log("Store - Replacing listings with new data");
+      } else {
+        // Append for pagination
+        newListings = [...currentListings, ...res.data.listings];
+        console.log("Store - Appending listings for pagination");
+      }
+
       set({
-        listings: res.data.listings,
+        listings: newListings,
         pagination: {
           currentPage: res.data.currentPage,
           totalPages: res.data.totalPages,
           totalListings: res.data.totalListings,
           limit: get().pagination.limit,
         },
+        sortBy: sortBy,
       });
 
-      console.log("Store - Updated state with listings:", res.data.listings);
+      console.log("Store - Updated state:", {
+        listingsCount: newListings.length,
+        sortBy: sortBy,
+        pagination: {
+          currentPage: res.data.currentPage,
+          totalPages: res.data.totalPages,
+          totalListings: res.data.totalListings,
+        }
+      });
+
     } catch (error) {
       console.error("Store - Error in getListings:", error);
       console.error("Store - Error response:", error.response?.data);
-      console.error("Store - Error status:", error.response?.status);
       toast.error(error.response?.data?.message || "Failed to fetch listings");
     } finally {
       set({ isLoading: false });
     }
   },
 
-  // Get filtered listings (apply current filters)
-  getFilteredListings: async (page = 1) => {
+  // Get filtered listings with sorting
+  getFilteredListings: async (page = 1, sortBy = null) => {
     const { filters } = get();
+    const currentSortBy = sortBy || get().sortBy;
     const activeFilters = {};
 
     // Only include non-empty filters
@@ -92,7 +115,11 @@ const useListingStore = create((set, get) => ({
       }
     });
 
-    await get().getListings(page, activeFilters);
+    console.log("getFilteredListings - activeFilters:", activeFilters);
+    console.log("getFilteredListings - sortBy:", currentSortBy);
+    console.log("getFilteredListings - page:", page);
+
+    await get().getListings(page, activeFilters, currentSortBy);
   },
 
   // Get single listing by ID
@@ -259,14 +286,19 @@ const useListingStore = create((set, get) => ({
     }
   },
 
-  // Set filters
+  // Set sort option
+  setSortBy: (sortBy) => {
+    set({ sortBy });
+  },
+
+  // Set filters with date support
   setFilters: (newFilters) => {
     set({
       filters: { ...get().filters, ...newFilters },
     });
   },
 
-  // Clear filters
+  // Clear filters including dates
   clearFilters: () => {
     set({
       filters: {
@@ -278,6 +310,8 @@ const useListingStore = create((set, get) => ({
         maxPrice: "",
         guests: "",
         amenities: [],
+        checkIn: "",
+        checkOut: "",
       },
     });
   },

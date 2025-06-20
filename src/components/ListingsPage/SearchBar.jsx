@@ -14,12 +14,14 @@ const SearchBar = ({
   handleDateChange,
   handleCloseCalendar,
   handleClearDates,
+  sortBy = "recommended",
+  handleSort,
+  sortOptions,
 }) => {
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [sortBy, setSortBy] = useState("recommended");
 
   // Refs for click outside handling
   const guestDropdownRef = useRef(null);
@@ -40,18 +42,9 @@ const SearchBar = ({
     "Rajasthan, India",
   ];
 
-  const sortOptions = [
-    { value: "recommended", label: "Recommended" },
-    { value: "price-low", label: "Price: Low to High" },
-    { value: "price-high", label: "Price: High to Low" },
-    { value: "rating", label: "Highest Rated" },
-    { value: "newest", label: "Newest" },
-  ];
-
-  const handleSort = (sortOption) => {
-    setSortBy(sortOption);
+  const handleSortChange = (sortOption) => {
+    handleSort(sortOption);
     setShowSortDropdown(false);
-    console.log("Sort by:", sortOption);
   };
 
   // Click outside handlers
@@ -167,7 +160,7 @@ const SearchBar = ({
               sortBy={sortBy}
               showSortDropdown={showSortDropdown}
               setShowSortDropdown={setShowSortDropdown}
-              handleSort={handleSort}
+              handleSort={handleSortChange}
               sortDropdownRef={sortDropdownRef}
               sortTriggerRef={sortTriggerRef}
               sortOptions={sortOptions}
@@ -236,7 +229,7 @@ const SearchBar = ({
             sortBy={sortBy}
             showSortDropdown={showSortDropdown}
             setShowSortDropdown={setShowSortDropdown}
-            handleSort={handleSort}
+            handleSort={handleSortChange}
             sortDropdownRef={sortDropdownRef}
             sortTriggerRef={sortTriggerRef}
             sortOptions={sortOptions}

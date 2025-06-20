@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import SearchBar from "../components/ListingsPage/SearchBar";
 import ListingsGrid from "../components/ListingsPage/ListingsGrid";
 import useListingStore from "../store/useListingStore";
 
 const ListingsPage = () => {
+  const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState({
     where: "",
     checkIn: "",
@@ -18,28 +20,68 @@ const ListingsPage = () => {
     listings,
     isLoading,
     pagination,
+    sortBy,
     getListings,
     getFilteredListings,
     setFilters: setStoreFilters,
+    setSortBy,
     clearFilters,
   } = useListingStore();
 
-  // Add debugging
-  console.log("ListingsPage - listings:", listings);
-  console.log("ListingsPage - isLoading:", isLoading);
-  console.log("ListingsPage - pagination:", pagination);
-
-  // Load listings on component mount
+  // Initialize filters from URL parameters
   useEffect(() => {
-    console.log("ListingsPage - useEffect triggered, calling getListings");
-    getListings()
-      .then(() => {
-        console.log("ListingsPage - getListings completed");
-      })
-      .catch((error) => {
-        console.error("ListingsPage - getListings error:", error);
-      });
-  }, []); // Remove getListings from dependency array to prevent infinite loop
+    const urlWhere = searchParams.get("where") || "";
+    const urlCheckIn = searchParams.get("checkIn") || "";
+    const urlCheckOut = searchParams.get("checkOut") || "";
+    const urlGuests = parseInt(searchParams.get("guests")) || 1;
+
+    // Parse dates from URL
+    let dateRange = [null, null];
+    if (urlCheckIn) {
+      dateRange[0] = new Date(urlCheckIn);
+      if (urlCheckOut) {
+        dateRange[1] = new Date(urlCheckOut);
+      }
+    }
+
+    // Update local filters
+    const initialFilters = {
+      where: urlWhere,
+      checkIn: urlCheckIn,
+      checkOut: urlCheckOut,
+      guests: urlGuests,
+      children: 0,
+      dateRange: dateRange,
+    };
+
+    setFilters(initialFilters);
+
+    // Update store filters
+    const storeFilters = {
+      city: urlWhere,
+      guests: urlGuests.toString(),
+      checkIn: urlCheckIn,
+      checkOut: urlCheckOut,
+    };
+
+    setStoreFilters(storeFilters);
+
+    // Load listings with initial filters
+    if (urlWhere || urlCheckIn || urlGuests > 1) {
+      console.log("Loading listings with URL parameters");
+      getFilteredListings(1, sortBy);
+    } else {
+      console.log("Loading all listings");
+      getListings(1, {}, sortBy);
+    }
+  }, [
+    searchParams,
+    getListings,
+    getFilteredListings,
+    setStoreFilters,
+    setSortBy,
+    sortBy,
+  ]);
 
   const handleInputChange = (field, value) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
@@ -49,7 +91,7 @@ const ListingsPage = () => {
       setStoreFilters({ city: value });
     }
     if (field === "guests") {
-      setStoreFilters({ guests: value });
+      setStoreFilters({ guests: value.toString() });
     }
   };
 
@@ -62,9 +104,11 @@ const ListingsPage = () => {
     // Update total guests in store
     const totalGuests = Math.max(
       0,
-      filters.guests + (field === "guests" ? increment : 0)
+      filters.guests +
+        (field === "guests" ? increment : 0) +
+        (field === "children" ? increment : 0)
     );
-    setStoreFilters({ guests: totalGuests });
+    setStoreFilters({ guests: totalGuests.toString() });
   };
 
   const handleSearch = async () => {
@@ -73,20 +117,33 @@ const ListingsPage = () => {
     // Convert form filters to store filters format
     const storeFilters = {
       city: filters.where,
-      guests: filters.guests + filters.children,
+      guests: (filters.guests + filters.children).toString(),
+      checkIn: filters.checkIn,
+      checkOut: filters.checkOut,
     };
 
     setStoreFilters(storeFilters);
-    await getFilteredListings(1);
+    await getFilteredListings(1, sortBy);
   };
 
   const handleDateChange = (value) => {
+    const checkIn =
+      value && value[0] ? value[0].toISOString().split("T")[0] : "";
+    const checkOut =
+      value && value[1] ? value[1].toISOString().split("T")[0] : "";
+
     setFilters((prev) => ({
       ...prev,
       dateRange: value,
-      checkIn: value && value[0] ? value[0].toISOString().split("T")[0] : "",
-      checkOut: value && value[1] ? value[1].toISOString().split("T")[0] : "",
+      checkIn: checkIn,
+      checkOut: checkOut,
     }));
+
+    // Update store filters
+    setStoreFilters({
+      checkIn: checkIn,
+      checkOut: checkOut,
+    });
   };
 
   const handleClearDates = () => {
@@ -96,16 +153,38 @@ const ListingsPage = () => {
       checkIn: "",
       checkOut: "",
     }));
+
+    setStoreFilters({
+      checkIn: "",
+      checkOut: "",
+    });
   };
 
   const handleCloseCalendar = () => {
     // This will be handled by the SearchBar component
   };
 
+  // Handle sorting
+  const handleSort = async (sortOption) => {
+    console.log("ListingsPage - Sorting by:", sortOption);
+    console.log(
+      "ListingsPage - Current listings before sort:",
+      listings.length
+    );
+
+    // Update sort in store
+    setSortBy(sortOption);
+
+    // Always fetch from page 1 when sorting to get fresh sorted results
+    await getFilteredListings(1, sortOption);
+
+    console.log("ListingsPage - Sort completed");
+  };
+
   // Load more listings for pagination
   const handleLoadMore = async () => {
     if (pagination.currentPage < pagination.totalPages) {
-      await getFilteredListings(pagination.currentPage + 1);
+      await getFilteredListings(pagination.currentPage + 1, sortBy);
     }
   };
 
@@ -127,15 +206,19 @@ const ListingsPage = () => {
         handleDateChange={handleDateChange}
         handleCloseCalendar={handleCloseCalendar}
         handleClearDates={handleClearDates}
+        sortBy={sortBy}
+        handleSort={handleSort}
+        sortOptions={sortOptions}
       />
 
       <ListingsGrid
         stays={listings}
-        sortBy="recommended"
+        sortBy={sortBy}
         sortOptions={sortOptions}
         isLoading={isLoading}
         pagination={pagination}
         onLoadMore={handleLoadMore}
+        onSort={handleSort}
       />
     </div>
   );

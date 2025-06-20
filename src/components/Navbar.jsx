@@ -132,18 +132,7 @@ const Navbar = ({ onAuthClick }) => {
           >
             Listings
           </button>
-          <button
-            onClick={() => handleNavigation("/experiences")}
-            className="hover:opacity-80 transition-all duration-300 hover:scale-105"
-          >
-            Experiences
-          </button>
-          <button
-            onClick={() => handleNavigation("/help")}
-            className="hover:opacity-80 transition-all duration-300 hover:scale-105"
-          >
-            Help
-          </button>
+
           <div className="flex items-center space-x-4 ml-6">
             {authUser ? (
               <>

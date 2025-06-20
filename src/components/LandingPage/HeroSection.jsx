@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   MapPin,
@@ -11,6 +12,7 @@ import ReactCalendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState({
     where: "",
     checkIn: "",
@@ -40,6 +42,33 @@ const HeroSection = () => {
 
   const handleSearch = () => {
     console.log("Search filters:", filters);
+
+    // Create search parameters
+    const searchParams = new URLSearchParams();
+
+    if (filters.where) {
+      searchParams.set("where", filters.where);
+    }
+
+    if (filters.dateRange && filters.dateRange[0]) {
+      searchParams.set(
+        "checkIn",
+        filters.dateRange[0].toISOString().split("T")[0]
+      );
+      if (filters.dateRange[1]) {
+        searchParams.set(
+          "checkOut",
+          filters.dateRange[1].toISOString().split("T")[0]
+        );
+      }
+    }
+
+    if (filters.guests) {
+      searchParams.set("guests", filters.guests.toString());
+    }
+
+    // Navigate to listings page with search parameters
+    navigate(`/listings?${searchParams.toString()}`);
   };
 
   // Handle date range changes

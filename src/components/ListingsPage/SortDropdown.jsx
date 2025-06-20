@@ -11,6 +11,11 @@ const SortDropdown = ({
   sortOptions,
   isMobile = false,
 }) => {
+  const handleSortSelection = (value) => {
+    handleSort(value);
+    setShowSortDropdown(false);
+  };
+
   return (
     <div className="relative">
       <button
@@ -23,7 +28,11 @@ const SortDropdown = ({
         }`}
       >
         <ArrowUpDown className="h-4 w-4" />
-        <span className={`font-medium ${isMobile ? "text-sm" : ""}`}>Sort</span>
+        <span className={`font-medium ${isMobile ? "text-sm" : ""}`}>
+          Sort:{" "}
+          {sortOptions.find((opt) => opt.value === sortBy)?.label ||
+            "Recommended"}
+        </span>
         <ChevronDown
           className={`text-gray-400 transition-transform duration-300 ${
             showSortDropdown ? "rotate-180" : ""
@@ -44,7 +53,7 @@ const SortDropdown = ({
           {sortOptions.map((option) => (
             <button
               key={option.value}
-              onClick={() => handleSort(option.value)}
+              onClick={() => handleSortSelection(option.value)}
               className={`w-full text-left hover:bg-gray-50 transition-colors text-sm ${
                 sortBy === option.value
                   ? "text-red-600 font-semibold bg-red-50"
