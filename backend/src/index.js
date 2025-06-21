@@ -8,6 +8,8 @@ import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.route.js";
 import listingRoutes from "./routes/listing.route.js";
 import bookingRoutes from "./routes/booking.route.js";
+import reviewRoutes from "./routes/review.route.js";
+import wishlistRoutes from "./routes/wishlist.route.js";
 
 dotenv.config();
 
@@ -33,6 +35,8 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/wishlists", wishlistRoutes); // Added wishlist route
 
 // Health check route
 app.get("/api/health", (req, res) => {

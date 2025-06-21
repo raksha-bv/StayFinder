@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart, Star } from "lucide-react";
+import useWishlistStore from "../store/useWishlistStore";
+import useAuthStore from "../store/useAuthStore";
 
 const StayCard = ({
   id,
@@ -23,7 +25,35 @@ const StayCard = ({
 }) => {
   const navigate = useNavigate();
   const [currentImage, setCurrentImage] = useState(0);
+
+  const { authUser } = useAuthStore();
+  const {
+    wishlists,
+    isListingInWishlist,
+    getWishlistsWithListing,
+    addToWishlist,
+    removeFromWishlist,
+    createWishlist,
+    getUserWishlists,
+    isAddingToWishlist,
+    isRemovingFromWishlist,
+  } = useWishlistStore();
+
   const [isLiked, setIsLiked] = useState(false);
+
+  // Check if listing is in wishlist on component mount and when wishlists change
+  useEffect(() => {
+    if (id && wishlists.length > 0) {
+      setIsLiked(isListingInWishlist(id));
+    }
+  }, [id, wishlists, isListingInWishlist]);
+
+  // Load user wishlists on component mount if user is authenticated
+  useEffect(() => {
+    if (authUser) {
+      getUserWishlists();
+    }
+  }, [authUser, getUserWishlists]);
 
   const nextImage = (e) => {
     e.stopPropagation();
@@ -40,9 +70,51 @@ const StayCard = ({
     setCurrentImage(index);
   };
 
-  const handleLike = (e) => {
+  const handleLike = async (e) => {
     e.stopPropagation();
-    setIsLiked(!isLiked);
+
+    // Check if user is authenticated
+    if (!authUser) {
+      navigate("/login");
+      return;
+    }
+
+    if (!id) {
+      console.error("Listing ID is required");
+      return;
+    }
+
+    try {
+      if (isLiked) {
+        // Remove from wishlist
+        const wishlistsWithListing = getWishlistsWithListing(id);
+
+        if (wishlistsWithListing.length > 0) {
+          // Remove from the first wishlist (or you could show a modal to select which one)
+          const firstWishlist = wishlistsWithListing[0];
+          await removeFromWishlist(firstWishlist._id, id);
+        }
+      } else {
+        // Add to wishlist
+        if (wishlists.length === 0) {
+          // Create a default wishlist if user has none
+          const newWishlist = await createWishlist({
+            name: "My Wishlist",
+            isPrivate: true,
+          });
+
+          if (newWishlist) {
+            await addToWishlist(newWishlist._id, id);
+          }
+        } else {
+          // Add to the first wishlist (or you could show a modal to select which one)
+          const defaultWishlist = wishlists[0];
+          await addToWishlist(defaultWishlist._id, id);
+        }
+      }
+    } catch (error) {
+      console.error("Error handling wishlist action:", error);
+    }
   };
 
   const handleCardClick = () => {
@@ -50,6 +122,9 @@ const StayCard = ({
       navigate(`/listings/${id}`);
     }
   };
+
+  // Show loading state on heart button when adding/removing
+  const isWishlistLoading = isAddingToWishlist || isRemovingFromWishlist;
 
   return (
     <div className="w-full group cursor-pointer" onClick={handleCardClick}>
@@ -65,13 +140,18 @@ const StayCard = ({
         {/* Heart Icon */}
         <button
           onClick={handleLike}
-          className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 p-1.5 sm:p-2 rounded-full bg-black/10 hover:bg-black/20 transition-all duration-300"
+          disabled={isWishlistLoading}
+          className={`absolute top-2 right-2 sm:top-3 sm:right-3 z-20 p-1.5 sm:p-2 rounded-full transition-all duration-300 ${
+            isWishlistLoading
+              ? "bg-black/20 cursor-not-allowed"
+              : "bg-black/10 hover:bg-black/20"
+          }`}
         >
           <Heart
             size={14}
             className={`sm:w-4 sm:h-4 transition-all duration-300 ${
               isLiked ? "fill-red-500 text-red-500" : "text-white"
-            }`}
+            } ${isWishlistLoading ? "animate-pulse" : ""}`}
           />
         </button>
 

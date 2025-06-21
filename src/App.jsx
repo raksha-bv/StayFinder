@@ -10,6 +10,7 @@ import useAuthStore from "./store/useAuthStore";
 import ListingDetailsPage from "./pages/ListingDetailsPage";
 import BookingConfirmationPage from "./pages/BookingConfirmationPage";
 import ProfilePage from "./pages/ProfilePage";
+import WishlistPage from "./pages/WishlistPage";
 
 function App() {
   const [authModal, setAuthModal] = useState({
@@ -166,6 +167,20 @@ function App() {
               <>
                 <Navbar onAuthClick={handleAuthClick} />
                 <ProfilePage />
+                <AuthPage
+                  isOpen={authModal.isOpen}
+                  onClose={closeAuthModal}
+                  initialMode={authModal.mode}
+                />
+              </>
+            }
+          />
+          <Route
+            path="/wishlists"
+            element={
+              <>
+                <Navbar onAuthClick={handleAuthClick} />
+                <WishlistPage />
                 <AuthPage
                   isOpen={authModal.isOpen}
                   onClose={closeAuthModal}

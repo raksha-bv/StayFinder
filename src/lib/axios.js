@@ -1,14 +1,14 @@
 import axios from "axios";
 
 export const axiosInstance = axios.create({
-  baseURL: "https://stayfinder-s425.onrender.com/api",
+  baseURL: "http://localhost:5001/api",
   withCredentials: true,
 });
-
+// https://stayfinder-s425.onrender.com/api
 // Set token from localStorage on app start
-const token = localStorage.getItem('token');
+const token = localStorage.getItem("token");
 if (token) {
-  axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 }
 
 axiosInstance.interceptors.request.use(
@@ -41,10 +41,10 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Clear token on 401
-      localStorage.removeItem('token');
-      delete axiosInstance.defaults.headers.common['Authorization'];
+      localStorage.removeItem("token");
+      delete axiosInstance.defaults.headers.common["Authorization"];
     }
-    
+
     if (error.response?.status !== 401) {
       console.error("Axios - Response error:", error.message);
       if (error.code === "ERR_NETWORK") {

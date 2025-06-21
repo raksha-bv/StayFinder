@@ -132,6 +132,15 @@ const Navbar = ({ onAuthClick }) => {
           >
             Listings
           </button>
+          
+          {authUser && (
+            <button
+              onClick={() => handleNavigation("/wishlists")}
+              className="hover:opacity-80 transition-all duration-300 hover:scale-105"
+            >
+              Wishlists
+            </button>
+          )}
 
           <div className="flex items-center space-x-4 ml-6">
             {authUser ? (
@@ -213,6 +222,16 @@ const Navbar = ({ onAuthClick }) => {
               >
                 Listings
               </button>
+              
+              {authUser && (
+                <button
+                  onClick={() => handleNavigation("/wishlists")}
+                  className="hover:text-gray-600 transition-all duration-300 py-3 text-lg font-medium"
+                >
+                  Wishlists
+                </button>
+              )}
+              
               <button
                 onClick={() => handleNavigation("/experiences")}
                 className="hover:text-gray-600 transition-all duration-300 py-3 text-lg font-medium"

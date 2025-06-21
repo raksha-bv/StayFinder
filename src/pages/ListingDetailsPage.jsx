@@ -26,17 +26,19 @@ import {
 } from "lucide-react";
 import useListingStore from "../store/useListingStore";
 import useBookingStore from "../store/useBookingStore";
+import useWishlistStore from "../store/useWishlistStore";
+import useAuthStore from "../store/useAuthStore";
 import DateRangeCalendar from "../components/DateRangeCalendar";
 import GuestSearch from "../components/ListingsPage/GuestSearch";
 import toast from "react-hot-toast";
+import ReviewSection from "../components/ListingDetailsPage/ReviewSection";
 
 const ListingDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  
+
   // Date and Guest state
   const [dateRange, setDateRange] = useState([null, null]);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -45,7 +47,7 @@ const ListingDetailsPage = () => {
     guests: 1,
     children: 0,
   });
-  
+
   const [specialRequests, setSpecialRequests] = useState("");
   const [totalAmount, setTotalAmount] = useState(0);
   const [nights, setNights] = useState(0);
@@ -68,11 +70,41 @@ const ListingDetailsPage = () => {
     validateBookingDates,
   } = useBookingStore();
 
+  // Wishlist store
+  const { authUser } = useAuthStore();
+  const {
+    wishlists,
+    isListingInWishlist,
+    getWishlistsWithListing,
+    addToWishlist,
+    removeFromWishlist,
+    createWishlist,
+    getUserWishlists,
+    isAddingToWishlist,
+    isRemovingFromWishlist,
+  } = useWishlistStore();
+
+  const [isLiked, setIsLiked] = useState(false);
+
   useEffect(() => {
     if (id) {
       getListingById(id);
     }
   }, [id, getListingById]);
+
+  // Load user wishlists on component mount if user is authenticated
+  useEffect(() => {
+    if (authUser) {
+      getUserWishlists();
+    }
+  }, [authUser, getUserWishlists]);
+
+  // Check if listing is in wishlist when wishlists change
+  useEffect(() => {
+    if (id && wishlists.length > 0) {
+      setIsLiked(isListingInWishlist(id));
+    }
+  }, [id, wishlists, isListingInWishlist]);
 
   // Calculate total amount and nights when dates change
   useEffect(() => {
@@ -173,17 +205,17 @@ const ListingDetailsPage = () => {
   };
 
   const adjustGuests = (type, increment) => {
-    setGuests(prev => ({
+    setGuests((prev) => ({
       ...prev,
-      [type]: Math.max(type === 'guests' ? 1 : 0, prev[type] + increment)
+      [type]: Math.max(type === "guests" ? 1 : 0, prev[type] + increment),
     }));
   };
 
   const handleCheckAvailability = async () => {
     if (!dateRange[0] || !dateRange[1] || !id) return;
 
-    const checkIn = dateRange[0].toISOString().split('T')[0];
-    const checkOut = dateRange[1].toISOString().split('T')[0];
+    const checkIn = dateRange[0].toISOString().split("T")[0];
+    const checkOut = dateRange[1].toISOString().split("T")[0];
 
     const dateValidation = validateBookingDates(checkIn, checkOut);
     if (!dateValidation.valid) {
@@ -191,6 +223,51 @@ const ListingDetailsPage = () => {
     }
 
     await checkAvailability(id, checkIn, checkOut);
+  };
+
+  const handleLike = async () => {
+    // Check if user is authenticated
+    if (!authUser) {
+      navigate("/login");
+      return;
+    }
+
+    if (!id) {
+      console.error("Listing ID is required");
+      return;
+    }
+
+    try {
+      if (isLiked) {
+        // Remove from wishlist
+        const wishlistsWithListing = getWishlistsWithListing(id);
+
+        if (wishlistsWithListing.length > 0) {
+          // Remove from the first wishlist (or you could show a modal to select which one)
+          const firstWishlist = wishlistsWithListing[0];
+          await removeFromWishlist(firstWishlist._id, id);
+        }
+      } else {
+        // Add to wishlist
+        if (wishlists.length === 0) {
+          // Create a default wishlist if user has none
+          const newWishlist = await createWishlist({
+            name: "My Wishlist",
+            isPrivate: true,
+          });
+
+          if (newWishlist) {
+            await addToWishlist(newWishlist._id, id);
+          }
+        } else {
+          // Add to the first wishlist (or you could show a modal to select which one)
+          const defaultWishlist = wishlists[0];
+          await addToWishlist(defaultWishlist._id, id);
+        }
+      }
+    } catch (error) {
+      console.error("Error handling wishlist action:", error);
+    }
   };
 
   const formatDateRange = () => {
@@ -240,7 +317,9 @@ const ListingDetailsPage = () => {
 
   const shareOnSocial = (platform) => {
     const currentUrl = encodeURIComponent(window.location.href);
-    const title = encodeURIComponent(currentListing?.title || "Check out this amazing place");
+    const title = encodeURIComponent(
+      currentListing?.title || "Check out this amazing place"
+    );
     const description = encodeURIComponent(
       `${currentListing?.title} in ${currentListing?.location?.city}, ${currentListing?.location?.country}. Starting from ₹${currentListing?.pricing?.basePrice}/night`
     );
@@ -299,8 +378,8 @@ const ListingDetailsPage = () => {
       return;
     }
 
-    const checkIn = dateRange[0].toISOString().split('T')[0];
-    const checkOut = dateRange[1].toISOString().split('T')[0];
+    const checkIn = dateRange[0].toISOString().split("T")[0];
+    const checkOut = dateRange[1].toISOString().split("T")[0];
 
     const dateValidation = validateBookingDates(checkIn, checkOut);
     if (!dateValidation.valid) {
@@ -335,14 +414,14 @@ const ListingDetailsPage = () => {
 
       if (booking) {
         toast.success("Booking created successfully!");
-        
+
         setDateRange([null, null]);
         setGuests({ guests: 1, children: 0 });
         setSpecialRequests("");
         setTotalAmount(0);
         setNights(0);
         clearAvailability();
-        
+
         navigate(`/booking-confirmation/${booking._id}`);
       }
     } catch (error) {
@@ -363,6 +442,9 @@ const ListingDetailsPage = () => {
   const formatPropertyType = (propertyType) => {
     return propertyType.charAt(0).toUpperCase() + propertyType.slice(1);
   };
+
+  // Show loading state on heart button when adding/removing
+  const isWishlistLoading = isAddingToWishlist || isRemovingFromWishlist;
 
   if (isLoading) {
     return (
@@ -409,7 +491,9 @@ const ListingDetailsPage = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Share this listing</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Share this listing
+              </h3>
               <button
                 onClick={() => setShowShareModal(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -489,7 +573,7 @@ const ListingDetailsPage = () => {
           </button>
 
           <div className="flex items-center space-x-3">
-            <button 
+            <button
               onClick={handleShare}
               className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
@@ -499,14 +583,27 @@ const ListingDetailsPage = () => {
               </span>
             </button>
             <button
-              onClick={() => setIsLiked(!isLiked)}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+              onClick={handleLike}
+              disabled={isWishlistLoading}
+              className={`flex items-center space-x-2 transition-colors ${
+                isWishlistLoading
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
             >
               <Heart
                 size={18}
-                className={isLiked ? "fill-red-500 text-red-500" : ""}
+                className={`transition-all duration-300 ${
+                  isLiked ? "fill-red-500 text-red-500" : ""
+                } ${isWishlistLoading ? "animate-pulse" : ""}`}
               />
-              <span className="hidden sm:inline text-sm font-medium">Save</span>
+              <span className="hidden sm:inline text-sm font-medium">
+                {isWishlistLoading
+                  ? "Saving..."
+                  : isLiked
+                  ? "Saved"
+                  : "Save"}
+              </span>
             </button>
           </div>
         </div>
@@ -796,9 +893,7 @@ const ListingDetailsPage = () => {
                         <span className="text-gray-800 font-semibold text-lg">
                           Children
                         </span>
-                        <p className="text-gray-500 text-sm">
-                          Ages 2-12
-                        </p>
+                        <p className="text-gray-500 text-sm">Ages 2-12</p>
                       </div>
                       <div className="flex items-center space-x-4">
                         <button
@@ -956,6 +1051,9 @@ const ListingDetailsPage = () => {
             </div>
           </div>
         )}
+
+        {/* Reviews Section */}
+        <ReviewSection listingId={id} hostId={currentListing.host?._id} />
       </div>
     </div>
   );
